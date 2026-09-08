@@ -1,7 +1,20 @@
 """
-Suite de Pruebas Unitarias para el Sistema de Biblioteca Cordillera
-Verifica validación de RUT, jerarquía de materiales, transacciones de préstamos,
-políticas de renovación, reglas infranqueables y persistencia SQLite.
+========================================================================================
+MÓDULO: test_biblioteca.py
+ROL EN EL PROYECTO:
+    Suite de Pruebas Unitarias Automatizadas (Unit Testing) con el framework estándar unittest.
+    
+    Responsabilidades Principales:
+    - Asegurar que las 4 Reglas Infranqueables del Dominio se cumplan rigurosamente.
+    - Probar que las Excepciones de Negocio se disparen exactamente en los escenarios previstos:
+      * RutInvalidoError: Si el dígito verificador es incorrecto.
+      * SocioConMultaPendienteError: Si un socio con multa intenta pedir un préstamo.
+      * MaterialYaPrestadoError: Si se intenta pedir un libro que ya está prestado.
+      * RenovacionNoPermitidaError: Si se intenta renovar material no elegible o se excede el cupo.
+      * PermisoInsuficienteError: Si una bibliotecaria intenta realizar acciones de administradora.
+    - Validar el polimorfismo de duraciones y cálculos arancelarios en moneda extranjera.
+    - Utilizar una base de datos SQLite en memoria (':memory:') para aislar cada test.
+========================================================================================
 """
 
 import unittest
@@ -25,13 +38,20 @@ from excepciones import (
 
 
 class TestBiblioteca(unittest.TestCase):
+    """
+    Casos de prueba unitaria para validar integridad de datos, seguridad, polimorfismo y reglas.
+    """
 
     def setUp(self):
-        # Usamos base de datos en memoria para aislamiento perfecto en tests
+        """
+        Precondición de prueba:
+        Crea una base de datos SQLite en memoria ':memory:' limpia antes de cada prueba,
+        garantizando total independencia entre tests.
+        """
         self.repo = RepositorioBibliotecaBD(connection_string=":memory:")
         self.sistema = SistemaBiblioteca(repo_bd=self.repo)
 
-        # Crear usuarios base con RUTs válidos
+        # Usuarios de prueba con RUTs matemáticamente válidos
         self.admin = Administradora(
             rut="19.876.543-0",
             nombre_completo="Camila Admin",
@@ -52,7 +72,7 @@ class TestBiblioteca(unittest.TestCase):
         self.sistema.registrar_usuario(self.admin)
         self.sistema.registrar_usuario(self.bibliotecaria)
 
-        # Inscribir socio con RUT válido
+        # Socio habilitado de prueba
         self.socio = self.sistema.inscribir_socio(
             rut="18.234.567-9",
             nombre_completo="Juan Perez",
@@ -60,7 +80,7 @@ class TestBiblioteca(unittest.TestCase):
             email="juan@test.cl"
         )
 
-        # Materiales
+        # Catálogo de prueba con las 3 subclases principales
         self.libro = Libro(
             codigo="L001",
             titulo="Libro Test",
@@ -96,28 +116,45 @@ class TestBiblioteca(unittest.TestCase):
         self.sistema.alta_nuevo_material(self.admin, self.dvd)
 
     def test_rut_modulo_11(self):
-        """Valida el cálculo y validación de RUT chileno."""
+        """
+        Prueba de Regla N°3 (Validación de RUT y excepción RutInvalidoError):
+        - Verifica que RUTs válidos sean aprobados sin importar formato.
+        - Verifica que RUTs con DV adulterado fallen y disparen RutInvalidoError.
+        """
         self.assertTrue(Persona.validar_rut("19.876.543-0"))
         self.assertTrue(Persona.validar_rut("17.654.321-3"))
         self.assertTrue(Persona.validar_rut("16.543.210-K"))
         self.assertFalse(Persona.validar_rut("11.111.111-2"))
         self.assertFalse(Persona.validar_rut("invalido"))
+        
+        # Debe disparar RutInvalidoError al intentar registrar una persona con RUT erróneo
         with self.assertRaises(RutInvalidoError):
             self.sistema.inscribir_socio("11.111.111-2", "Error", "123", "err@test.cl")
 
     def test_autenticacion_sha256(self):
-        """Valida la autenticación con hash SHA-256."""
+        """
+        Prueba de Seguridad de Acceso:
+        Comprueba que la autenticación solo tenga éxito si el hash coincide con la clave original.
+        """
         self.assertTrue(self.admin.autenticar("Password123*"))
         self.assertFalse(self.admin.autenticar("WrongPassword"))
 
     def test_politicas_duracion_materiales(self):
-        """Valida los días de préstamo polimórficos de cada tipo de material."""
+        """
+        Prueba de Polimorfismo en Duración de Préstamo:
+        Verifica que cada subclase devuelva su plazo reglamentario: Libros=14d, Revistas=7d, DVDs=3d.
+        """
         self.assertEqual(self.libro.dias_prestamo(), 14)
         self.assertEqual(self.revista.dias_prestamo(), 7)
         self.assertEqual(self.dvd.dias_prestamo(), 3)
 
     def test_politicas_renovacion(self):
-        """Valida que los libros se renueven hasta 1 vez y las revistas/DVDs 0 veces."""
+        """
+        Prueba de Excepción RenovacionNoPermitidaError:
+        - 1ra renovación de libro permitida.
+        - 2da renovación de libro rechazada (supera cupo máximo de 1).
+        - Renovación de revista rechazada inmediatamente (0 renovaciones permitidas).
+        """
         prestamo = self.sistema.crear_prestamo(
             rut_socio=self.socio.get_rut(),
             cods_materiales=["L001", "R001"],
@@ -127,16 +164,19 @@ class TestBiblioteca(unittest.TestCase):
         # 1ra renovación libro -> OK
         self.assertTrue(self.sistema.renovar_material_prestamo(prestamo.id_prestamo, "L001"))
 
-        # 2da renovación libro -> Error
+        # 2da renovación libro -> Dispara RenovacionNoPermitidaError
         with self.assertRaises(RenovacionNoPermitidaError):
             self.sistema.renovar_material_prestamo(prestamo.id_prestamo, "L001")
 
-        # Renovación revista -> Error
+        # Renovación de revista -> Dispara RenovacionNoPermitidaError
         with self.assertRaises(RenovacionNoPermitidaError):
             self.sistema.renovar_material_prestamo(prestamo.id_prestamo, "R001")
 
     def test_bloqueo_socio_con_multa(self):
-        """Regla 1: Bloqueo de préstamo a socios con multas pendientes."""
+        """
+        Prueba de Regla Infranqueable N°1 (SocioConMultaPendienteError):
+        Verifica que un socio con multas impagas quede bloqueado para pedir nuevos libros.
+        """
         self.socio.registrar_multa(1000.0)
         self.assertFalse(self.socio.puede_solicitar_prestamo())
         with self.assertRaises(SocioConMultaPendienteError):
@@ -147,7 +187,10 @@ class TestBiblioteca(unittest.TestCase):
             )
 
     def test_bloqueo_material_ya_prestado(self):
-        """Regla 2: Bloqueo de préstamo de material que ya está prestado."""
+        """
+        Prueba de Regla Infranqueable N°2 (MaterialYaPrestadoError):
+        Verifica que no se pueda prestar un ejemplar que ya se encuentra prestado a otro socio.
+        """
         self.sistema.crear_prestamo(
             rut_socio=self.socio.get_rut(),
             cods_materiales=["L001"],
@@ -162,7 +205,10 @@ class TestBiblioteca(unittest.TestCase):
             )
 
     def test_segregacion_permisos(self):
-        """Regla 4: Bibliotecaria no puede dar de alta ni condonar multas."""
+        """
+        Prueba de Regla Infranqueable N°4 (PermisoInsuficienteError):
+        Verifica que una bibliotecaria no pueda ejecutar atribuciones exclusivas de la administradora.
+        """
         nuevo_libro = Libro("L002", "L2", "Aut", 2020, 10000, "111", "Ed", 100)
         with self.assertRaises(PermisoInsuficienteError):
             self.sistema.alta_nuevo_material(self.bibliotecaria, nuevo_libro)
@@ -171,9 +217,12 @@ class TestBiblioteca(unittest.TestCase):
             self.sistema.condonar_multa_socio(self.bibliotecaria, self.socio.get_rut(), "Motivo")
 
     def test_material_extranjero_dolar(self):
-        """Cálculo de reposición en USD con 6% de arancel aduanero."""
+        """
+        Prueba de Cálculo Polimórfico de Reposición Arancelaria:
+        Verifica la fórmula: Costo = USD * (1 + 0.06 Arancel) * Valor Dólar.
+        $100 USD * 1.06 * $950 CLP/USD = $100,700 CLP.
+        """
         ext = MaterialExtranjero("E001", "AI Book", "Russell", 2020, precio_usd=100.0, recargo_aduanero_pct=0.06)
-        # 100 * 1.06 * 950 = 100,700
         costo = ext.calcular_valor_reposicion(950.0)
         self.assertEqual(costo, 100700.0)
 

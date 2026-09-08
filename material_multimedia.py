@@ -1,14 +1,28 @@
 """
-Módulo MaterialMultimedia
-Representa ítems audiovisuales (DVD, CD, Blu-ray).
-Política: 3 días de préstamo base por alta rotación de público y 0 renovaciones permitidas.
+========================================================================================
+MÓDULO: material_multimedia.py
+ROL EN EL PROYECTO:
+    Subclase concreta de Material que representa contenidos audiovisuales y ópticos
+    (DVD, CD de música, Blu-ray, documentales).
+    
+    Implementación de Políticas Polimórficas:
+    - dias_prestamo(): 3 días corridos.
+    - permite_renovacion(): False (No admite renovaciones debido a su alta rotación).
+    - max_renovaciones(): 0 renovaciones.
+    
+    Excepción Asociada:
+    - Si se intenta renovar un material multimedia, el sistema dispara
+      RenovacionNoPermitidaError impidiendo la extensión.
+========================================================================================
 """
 
 from material import Material
 
 
 class MaterialMultimedia(Material):
-    """Subclase representativa de discos ópticos y contenidos audiovisuales."""
+    """
+    Subclase que modela recursos audiovisuales (películas, documentales, música).
+    """
 
     def __init__(
         self,
@@ -34,28 +48,33 @@ class MaterialMultimedia(Material):
         self._duracion_minutos: int = int(duracion_minutos)
         self._clasificacion_edad: str = clasificacion_edad.strip().upper()
 
+    # ==================== PROPIEDADES ESPECÍFICAS ====================
     @property
     def formato(self) -> str:
+        """Soporte físico (ej: 'DVD', 'BLU-RAY', 'CD')."""
         return self._formato
 
     @property
     def duracion_minutos(self) -> int:
+        """Tiempo de reproducción en minutos."""
         return self._duracion_minutos
 
     @property
     def clasificacion_edad(self) -> str:
+        """Calificación de edad (ej: 'TE' Todo Espectador, '+14', '+18')."""
         return self._clasificacion_edad
 
+    # ==================== IMPLEMENTACIÓN DE MÉTODOS POLIMÓRFICOS ====================
     def dias_prestamo(self) -> int:
-        """Los ítems multimedia se prestan por un plazo máximo de 3 días."""
+        """Política: 3 días corridos por tratarse de ítems de consumo rápido y alta rotación."""
         return 3
 
     def permite_renovacion(self) -> bool:
-        """Los ítems multimedia no admiten renovación."""
+        """Política: No admite renovación."""
         return False
 
     def max_renovaciones(self) -> int:
-        """0 renovaciones permitidas."""
+        """Política: 0 renovaciones permitidas."""
         return 0
 
     def __str__(self) -> str:

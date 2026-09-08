@@ -1,7 +1,24 @@
 """
-Paquete Biblioteca Cordillera (POO Python)
-Sistema integral de gestión de préstamos bibliotecarios, control de socios,
-catálogo polimórfico, servicios de cotización de divisas y persistencia SQLite.
+========================================================================================
+PAQUETE: biblioteca_cordillera (__init__.py)
+ROL EN EL PROYECTO:
+    Punto de entrada de empaquetado para el sistema de la Biblioteca Cordillera.
+    Permite importar cualquier entidad del dominio directamente desde el paquete:
+    
+        from biblioteca_cordillera import (
+            SistemaBiblioteca,
+            Libro,
+            Socio,
+            SocioConMultaPendienteError
+        )
+        
+    Módulos y Jerarquías Exportadas:
+    - Dominio de Personas: Persona, Socio, Usuario, BibliotecariaAtencion, Administradora.
+    - Dominio de Materiales: Material, Libro, Revista, MaterialMultimedia, MaterialExtranjero.
+    - Transacciones: DetallePrestamo, Prestamo.
+    - Servicios y Persistencia: ServicioDolarAPI, RepositorioBibliotecaBD, SistemaBiblioteca.
+    - Excepciones del Dominio: BibliotecaError y sus subclases especializadas.
+========================================================================================
 """
 
 from persona import Persona

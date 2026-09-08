@@ -1,7 +1,42 @@
 """
-Módulo SistemaBiblioteca
-Fachada principal (Façade) y controlador del sistema de la Biblioteca Municipal Cordillera.
-Centraliza y orquesta todas las reglas de negocio, transacciones, políticas de préstamo y persistencia.
+========================================================================================
+MÓDULO: sistema_biblioteca.py
+ROL EN EL PROYECTO:
+    Controlador Principal y Fachada del Sistema (Design Pattern Façade / Controller).
+    
+    En el diagrama UML, SistemaBiblioteca es el corazón operativo que centraliza
+    y orquesta todos los flujos de trabajo de la institución:
+    
+            ┌──────────────────────────────────────────────────────────┐
+            │                     SistemaBiblioteca                    │
+            │                  (Fachada / Controlador)                 │
+            └─────────┬──────────────┬──────────────┬──────────────┬───┘
+                      │              │              │              │
+                 Catálogo de      Registro       Registro      Seguridad
+                  Materiales      de Socios    de Préstamos    y Usuarios
+                      │              │              │              │
+                      ▼              ▼              ▼              ▼
+            ┌──────────────────────────────────────────────────────────┐
+            │                 RepositorioBibliotecaBD                  │
+            │                     (SQLite Database)                    │
+            └──────────────────────────────────────────────────────────┘
+            
+    Responsabilidades Principales:
+    - Centralizar las colecciones en memoria (catálogo, socios, préstamos, usuarios).
+    - Orquestar los casos de uso: inscripción, alta/baja de catálogo, creación de préstamos,
+      devoluciones, prórrogas, condonación de multas y reporte de extravíos en USD.
+    - Garantizar el cumplimiento estricto de las 4 Reglas Infranqueables del Negocio.
+    - Sincronizar automáticamente cada evento con la base de datos y la bitácora.
+    
+    Excepciones Disparadas y Orquestadas:
+    - PermisoInsuficienteError: Si el usuario carece de rango para la acción.
+    - SocioConMultaPendienteError: Si el socio registra sanciones monetarias pendientes.
+    - MaterialYaPrestadoError: Si se intenta retirar un ejemplar no disponible.
+    - SocioNoEncontradoError: Si el RUT no existe en la nómina.
+    - MaterialNoEncontradoError: Si el código no está en el catálogo.
+    - PrestamoNoEncontradoError: Si el ID de préstamo no existe.
+    - RenovacionNoPermitidaError: Si el material no admite renovación o expiró el cupo.
+========================================================================================
 """
 
 from datetime import date, datetime
@@ -31,7 +66,9 @@ from excepciones import (
 
 
 class SistemaBiblioteca:
-    """Fachada integral para la gestión y orquestación de la Biblioteca Municipal Cordillera."""
+    """
+    Fachada integral para la gestión y orquestación de la Biblioteca Municipal Cordillera.
+    """
 
     def __init__(
         self,
@@ -40,15 +77,19 @@ class SistemaBiblioteca:
         servicio_dolar: Optional[ServicioDolarAPI] = None
     ):
         self._nombre_biblioteca: str = nombre_biblioteca
+        # Almacenamiento rápido en memoria (caché operativa del controlador)
         self._catalogo_materiales: Dict[str, Material] = {}
         self._registro_socios: Dict[str, Socio] = {}
         self._registro_prestamos: List[Prestamo] = []
         self._usuarios_sistema: Dict[str, Usuario] = {}
+        # Servicios auxiliares de persistencia y tipo de cambio
         self._repositorio_bd: RepositorioBibliotecaBD = repo_bd or RepositorioBibliotecaBD()
         self._servicio_dolar: ServicioDolarAPI = servicio_dolar or ServicioDolarAPI()
+        # Contadores correlativos para identificadores
         self._contador_prestamos: int = 1
         self._contador_socios: int = 1
 
+    # ==================== PROPIEDADES (GETTERS) ====================
     @property
     def nombre_biblioteca(self) -> str:
         return self._nombre_biblioteca
@@ -77,7 +118,7 @@ class SistemaBiblioteca:
     def repositorio_bd(self) -> RepositorioBibliotecaBD:
         return self._repositorio_bd
 
-    # ==================== GESTIÓN DE SOCIOS ====================
+    # ==================== CASOS DE USO: GESTIÓN DE SOCIOS ====================
     def inscribir_socio(
         self,
         rut: str,
@@ -87,8 +128,12 @@ class SistemaBiblioteca:
         fecha_inscripcion: Optional[date] = None
     ) -> Socio:
         """
-        Inscribe a un nuevo socio en el sistema tras validar su RUT chileno.
-        Si ya existía, lo retorna. Persiste la información en BD y bitácora.
+        Inscribe a un nuevo socio en el sistema.
+        
+        Validación:
+        - Si el RUT no cumple Módulo 11, la clase Socio/Persona lanzará RutInvalidoError.
+        - Si el socio ya existía, lo retorna evitando duplicados.
+        - Persiste el registro en SQLite y asienta el evento en log_auditoria.
         """
         rut_limpio = rut.replace(".", "").replace("-", "").strip().upper()
         for s in self._registro_socios.values():
@@ -115,7 +160,10 @@ class SistemaBiblioteca:
         return socio
 
     def buscar_socio_por_rut(self, rut: str) -> Socio:
-        """Busca un socio registrado por su RUT (soporta diversos formatos)."""
+        """
+        Consulta un socio en el registro activo.
+        Si no se localiza, lanza SocioNoEncontradoError.
+        """
         rut_limpio = rut.replace(".", "").replace("-", "").strip().upper()
         for s in self._registro_socios.values():
             if s.get_rut().replace(".", "").replace("-", "").strip().upper() == rut_limpio:
@@ -123,7 +171,10 @@ class SistemaBiblioteca:
         raise SocioNoEncontradoError(rut)
 
     def pagar_multa_socio(self, rut_socio: str, monto: float) -> float:
-        """Procesa el pago de multas de un socio."""
+        """
+        Procesa el pago de multas acumuladas. Si la deuda queda en $0, el socio
+        queda automáticamente habilitado para volver a retirar libros.
+        """
         socio = self.buscar_socio_por_rut(rut_socio)
         vuelto = socio.pagar_multa(monto)
         self._repositorio_bd.guardar_socio(socio)
@@ -133,9 +184,9 @@ class SistemaBiblioteca:
         )
         return vuelto
 
-    # ==================== GESTIÓN DE USUARIOS ====================
+    # ==================== CASOS DE USO: USUARIOS Y AUTENTICACIÓN ====================
     def registrar_usuario(self, usuario: Usuario) -> Usuario:
-        """Registra un empleado en el sistema y sincroniza con BD."""
+        """Registra un funcionario en el sistema y persiste en base de datos."""
         self._usuarios_sistema[usuario.username] = usuario
         self._repositorio_bd.guardar_usuario(usuario)
         self._repositorio_bd.registrar_auditoria(
@@ -145,16 +196,18 @@ class SistemaBiblioteca:
         return usuario
 
     def autenticar_usuario(self, username: str, password: str) -> Optional[Usuario]:
-        """Valida credenciales de acceso para un usuario del personal."""
+        """Comprueba credenciales comparando hashes SHA-256."""
         user = self._usuarios_sistema.get(username.strip().lower())
         if user and user.autenticar(password):
             return user
         return None
 
-    # ==================== GESTIÓN DE CATÁLOGO ====================
+    # ==================== CASOS DE USO: CATÁLOGO DE MATERIALES ====================
     def alta_nuevo_material(self, usuario_admin: Usuario, material: Material) -> None:
         """
-        Segregación de funciones: Solo usuarios con rol Administradora pueden dar de alta ítems.
+        Regla Infranqueable N°4 (Segregación de Roles):
+        Solo un usuario con rol 'ADMINISTRADORA' puede dar de alta nuevos ejemplares.
+        Si una bibliotecaria intenta hacerlo, lanza PermisoInsuficienteError.
         """
         if not isinstance(usuario_admin, Administradora) and not usuario_admin.tiene_permiso("dar_alta_material"):
             raise PermisoInsuficienteError(usuario_admin.username, "dar_alta_material")
@@ -169,7 +222,9 @@ class SistemaBiblioteca:
 
     def baja_material(self, usuario_admin: Usuario, cod_mat: str) -> None:
         """
-        Segregación de funciones: Solo Administradora puede retirar materiales del catálogo.
+        Regla Infranqueable N°4 (Segregación de Roles):
+        Solo 'ADMINISTRADORA' puede retirar ejemplares de circulación.
+        Si el material no existe, lanza MaterialNoEncontradoError.
         """
         if not isinstance(usuario_admin, Administradora) and not usuario_admin.tiene_permiso("eliminar_material"):
             raise PermisoInsuficienteError(usuario_admin.username, "eliminar_material")
@@ -186,13 +241,13 @@ class SistemaBiblioteca:
         )
 
     def buscar_material(self, cod_mat: str) -> Material:
-        """Consulta un material en el catálogo."""
+        """Consulta un material en el catálogo institucional."""
         cod = cod_mat.strip().upper()
         if cod not in self._catalogo_materiales:
             raise MaterialNoEncontradoError(cod)
         return self._catalogo_materiales[cod]
 
-    # ==================== OPERACIONES DE PRÉSTAMOS ====================
+    # ==================== CASOS DE USO: TRANSACCIÓN DE PRÉSTAMOS ====================
     def crear_prestamo(
         self,
         rut_socio: str,
@@ -201,12 +256,17 @@ class SistemaBiblioteca:
         fecha_prestamo: Optional[datetime] = None
     ) -> Prestamo:
         """
-        Crea un nuevo préstamo múltiple:
-        1. Valida permisos del usuario de atención.
-        2. Verifica que el socio no tenga multas pendientes (Regla Infranqueable N°1).
-        3. Verifica que todos los materiales existan y estén disponibles (Regla Infranqueable N°2).
-        4. Construye la cabecera y detalles, marcando los materiales como prestados.
-        5. Persiste en SQLite y genera auditoría.
+        Orquesta la transacción completa de préstamo múltiple:
+        
+        Etapas de Control:
+        1. Seguridad: Valida permiso 'registrar_prestamo'.
+        2. Regla Infranqueable N°1: Verifica que el socio no mantenga multas pendientes.
+           Si registra mora -> Lanza SocioConMultaPendienteError.
+        3. Valida que la lista de códigos solicitados no esté vacía.
+        4. Regla Infranqueable N°2: Verifica que cada material exista y esté disponible.
+           Si alguno ya está prestado -> Lanza MaterialYaPrestadoError.
+        5. Construye la cabecera Prestamo y agrega cada ítem DetallePrestamo.
+        6. Persiste en SQLite y asienta en log_auditoria.
         """
         if not usuario_atencion.tiene_permiso("registrar_prestamo"):
             raise PermisoInsuficienteError(usuario_atencion.username, "registrar_prestamo")
@@ -218,7 +278,7 @@ class SistemaBiblioteca:
         if not cods_materiales:
             raise BibliotecaError("Debe incluir al menos un material para generar un préstamo.")
 
-        # Validar disponibilidad de cada material antes de comprometer el préstamo
+        # Verificación previa de disponibilidad de todos los materiales pedidos
         materiales_a_prestar: List[Material] = []
         for cod in cods_materiales:
             mat = self.buscar_material(cod)
@@ -269,8 +329,8 @@ class SistemaBiblioteca:
         fecha_devolucion: Optional[date] = None
     ) -> None:
         """
-        Procesa la recepción y devolución de un material particular de un préstamo.
-        Calcula posibles multas por mora y actualiza BD.
+        Recepciona un ítem devuelto por el socio.
+        Si hubo atraso respecto a la fecha esperada, carga la multa automáticamente en BD.
         """
         if not usuario_atencion.tiene_permiso("registrar_devolucion"):
             raise PermisoInsuficienteError(usuario_atencion.username, "registrar_devolucion")
@@ -291,8 +351,8 @@ class SistemaBiblioteca:
         usuario_atencion: Optional[Usuario] = None
     ) -> bool:
         """
-        Aplica una renovación a un ítem dentro de un préstamo, respetando las políticas
-        específicas del tipo de material (Libros sí, Revistas y Multimedia no).
+        Aplica una renovación sobre el ítem solicitado.
+        Aplica las reglas polimórficas (Libros hasta 1, Revistas y DVDs 0).
         """
         if usuario_atencion and not usuario_atencion.tiene_permiso("renovar_material"):
             raise PermisoInsuficienteError(usuario_atencion.username, "renovar_material")
@@ -315,7 +375,8 @@ class SistemaBiblioteca:
         motivo: str = "Condonación administrativa autorizada"
     ) -> None:
         """
-        Segregación de funciones: Solo Administradora puede condonar deudas/multas.
+        Regla Infranqueable N°4 (Segregación de Roles):
+        Solo Administradora puede perdonar o condonar multas a un socio.
         """
         if not isinstance(usuario_admin, Administradora) and not usuario_admin.tiene_permiso("condonar_multa"):
             raise PermisoInsuficienteError(usuario_admin.username, "condonar_multa")
@@ -331,8 +392,14 @@ class SistemaBiblioteca:
 
     def registrar_perdida_material(self, rut_socio: str, cod_mat: str) -> float:
         """
-        Calcula el valor de reposición del material extraviado (cotizado en USD con API Dólar si es extranjero),
-        lo carga como multa al socio y retira el ejemplar del inventario activo.
+        Procesa el reporte de extravío de un ejemplar.
+        
+        Cálculo del costo de reposición:
+        - Si es MaterialExtranjero: Consulta la API del Dólar Observado y calcula:
+          Costo = Precio USD * (1 + 0.06 Arancel Aduanero) * Cotización Dólar.
+        - Si es Material nacional: Aplica el precio_base_reposicion en CLP.
+        
+        Aplica el cobro como multa al socio y lo suspende hasta que pague.
         """
         socio = self.buscar_socio_por_rut(rut_socio)
         material = self.buscar_material(cod_mat)
@@ -354,7 +421,7 @@ class SistemaBiblioteca:
         return costo_reposicion
 
     def guardar_estado_bd(self) -> bool:
-        """Sincroniza todos los socios, catálogo y préstamos en la base de datos."""
+        """Sincroniza masivamente la totalidad de socios, catálogo y préstamos en SQLite."""
         exito = True
         for socio in self._registro_socios.values():
             if not self._repositorio_bd.guardar_socio(socio):
@@ -368,6 +435,7 @@ class SistemaBiblioteca:
         return exito
 
     def _buscar_prestamo(self, id_prestamo: int) -> Prestamo:
+        """Busca una transacción de préstamo por ID o lanza PrestamoNoEncontradoError."""
         for p in self._registro_prestamos:
             if p.id_prestamo == id_prestamo:
                 return p

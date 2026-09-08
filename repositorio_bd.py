@@ -1,7 +1,25 @@
 """
-Módulo RepositorioBibliotecaBD
-Manejo de persistencia relacional SQLite para el sistema de la Biblioteca Cordillera.
-Gestiona almacenamiento seguro de socios, catálogo, préstamos, ítems y bitácora de auditoría.
+========================================================================================
+MÓDULO: repositorio_bd.py
+ROL EN EL PROYECTO:
+    Capa de Acceso a Datos (Data Access Layer / CRUD Handler) del sistema.
+    
+    En la arquitectura POO del proyecto, RepositorioBibliotecaBD es responsable de
+    la persistencia relacional en SQLite ('biblioteca_cordillera.db' o ':memory:').
+    
+    Tablas Administradas:
+    1. socios: Almacena identificación chilena, multas acumuladas y estado activo.
+    2. usuarios: Almacena credenciales, roles, turnos y contraseñas hasheadas en SHA-256.
+    3. materiales: Catálogo de libros, revistas, DVDs y extranjeros con metadatos JSON.
+    4. prestamos: Cabecera transaccional de cada préstamo efectuado.
+    5. detalles_prestamo: Registros individuales de cada ítem prestado con sus plazos.
+    6. log_auditoria: Bitácora inmutable de eventos para control de seguridad.
+    
+    Características de Diseño:
+    - Soporta bases de datos físicas (.db) y bases de datos en memoria (':memory:')
+      para tests unitarios rápidos y aislados.
+    - Implementa conexiones seguras con manejo de excepciones y cierre de cursores.
+========================================================================================
 """
 
 import sqlite3
@@ -11,13 +29,17 @@ from typing import Optional, Dict, Any, List
 
 
 class RepositorioBibliotecaBD:
-    """Clase responsable del acceso y persistencia de datos (CRUD) en SQLite."""
+    """
+    Clase encargada de ejecutar las sentencias SQL (CREATE, INSERT, SELECT, UPDATE, DELETE)
+    garantizando la integridad de los datos de la biblioteca.
+    """
 
     def __init__(self, connection_string: str = "biblioteca_cordillera.db"):
         self._connection_string: str = connection_string
         self._is_memory: bool = connection_string == ":memory:"
         self._persistent_conn: Optional[sqlite3.Connection] = None
         
+        # En bases de datos en memoria, preservamos una conexión abierta permanente
         if self._is_memory:
             self._persistent_conn = sqlite3.connect(":memory:")
             self._persistent_conn.row_factory = sqlite3.Row
@@ -25,7 +47,9 @@ class RepositorioBibliotecaBD:
         self._inicializar_tablas()
 
     def _get_connection(self) -> sqlite3.Connection:
-        """Retorna una conexión activa con formato de diccionario para filas."""
+        """
+        Provee una conexión activa configurada para devolver filas como diccionarios (sqlite3.Row).
+        """
         if self._is_memory and self._persistent_conn:
             return self._persistent_conn
         conn = sqlite3.connect(self._connection_string)
@@ -33,7 +57,10 @@ class RepositorioBibliotecaBD:
         return conn
 
     def _inicializar_tablas(self) -> None:
-        """Crea el esquema relacional en SQLite si no existe previamente."""
+        """
+        Construye el esquema relacional completo si no existe previamente.
+        Incluye llaves foráneas para mantener la integridad referencial.
+        """
         conn = self._get_connection()
         try:
             cursor = conn.cursor()
@@ -53,7 +80,7 @@ class RepositorioBibliotecaBD:
                 )
             """)
 
-            # Tabla de Usuarios (Bibliotecarias y Administradoras)
+            # Tabla de Usuarios (Bibliotecarias y Administradoras con SHA-256)
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS usuarios (
                     username TEXT PRIMARY KEY,
@@ -97,7 +124,7 @@ class RepositorioBibliotecaBD:
                 )
             """)
 
-            # Tabla Detalle de Préstamos
+            # Tabla Detalle de Préstamos (Ítems y fechas límite)
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS detalles_prestamo (
                     id_prestamo INTEGER NOT NULL,
@@ -115,7 +142,7 @@ class RepositorioBibliotecaBD:
                 )
             """)
 
-            # Tabla de Bitácora de Auditoría
+            # Tabla de Bitácora de Auditoría para trazabilidad de operaciones
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS log_auditoria (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -131,7 +158,7 @@ class RepositorioBibliotecaBD:
 
     # ==================== CRUD SOCIOS ====================
     def guardar_socio(self, socio: Any) -> bool:
-        """Inserta o actualiza un socio en la base de datos."""
+        """Inserta o actualiza un socio en la base de datos (UPSERT)."""
         conn = self._get_connection()
         try:
             cursor = conn.cursor()
@@ -161,7 +188,7 @@ class RepositorioBibliotecaBD:
                 conn.close()
 
     def obtener_socio(self, rut: str) -> Optional[Dict[str, Any]]:
-        """Obtiene un socio por su RUT."""
+        """Recupera un socio mediante su RUT."""
         conn = self._get_connection()
         try:
             cursor = conn.cursor()
@@ -173,7 +200,7 @@ class RepositorioBibliotecaBD:
                 conn.close()
 
     def listar_socios(self) -> List[Dict[str, Any]]:
-        """Retorna todos los socios registrados."""
+        """Retorna la nómina completa de socios registrados."""
         conn = self._get_connection()
         try:
             cursor = conn.cursor()
@@ -185,7 +212,7 @@ class RepositorioBibliotecaBD:
 
     # ==================== CRUD USUARIOS ====================
     def guardar_usuario(self, usuario: Any) -> bool:
-        """Inserta o actualiza un usuario en la base de datos."""
+        """Inserta o actualiza un funcionario en la base de datos."""
         conn = self._get_connection()
         try:
             turno = getattr(usuario, "turno", None)
@@ -230,7 +257,7 @@ class RepositorioBibliotecaBD:
                 conn.close()
 
     def listar_usuarios(self) -> List[Dict[str, Any]]:
-        """Retorna todos los usuarios del sistema."""
+        """Retorna todos los funcionarios registrados en el sistema."""
         conn = self._get_connection()
         try:
             cursor = conn.cursor()
@@ -242,7 +269,7 @@ class RepositorioBibliotecaBD:
 
     # ==================== CRUD MATERIALES ====================
     def guardar_material(self, material: Any) -> bool:
-        """Inserta o actualiza un material en el catálogo de la BD."""
+        """Serializa y almacena un material con sus atributos polimórficos en JSON."""
         conn = self._get_connection()
         try:
             tipo = material.__class__.__name__
@@ -290,7 +317,7 @@ class RepositorioBibliotecaBD:
                 conn.close()
 
     def actualizar_estado_material(self, codigo: str, prestado: bool) -> bool:
-        """Actualiza la disponibilidad de un material."""
+        """Actualiza el indicador booleano de disponibilidad en inventario."""
         conn = self._get_connection()
         try:
             cursor = conn.cursor()
@@ -307,7 +334,7 @@ class RepositorioBibliotecaBD:
                 conn.close()
 
     def eliminar_material(self, codigo: str) -> bool:
-        """Elimina un material del catálogo en BD."""
+        """Elimina físicamente un ítem del catálogo en base de datos."""
         conn = self._get_connection()
         try:
             cursor = conn.cursor()
@@ -322,7 +349,7 @@ class RepositorioBibliotecaBD:
                 conn.close()
 
     def listar_materiales(self) -> List[Dict[str, Any]]:
-        """Retorna todos los materiales del catálogo."""
+        """Retorna el inventario completo de materiales."""
         conn = self._get_connection()
         try:
             cursor = conn.cursor()
@@ -334,11 +361,11 @@ class RepositorioBibliotecaBD:
 
     # ==================== CRUD PRÉSTAMOS ====================
     def guardar_prestamo(self, prestamo: Any) -> bool:
-        """Persiste la cabecera y todas las líneas de detalle de un préstamo."""
+        """Persiste la transacción completa: cabecera, líneas de detalle y estado del socio."""
         conn = self._get_connection()
         try:
             cursor = conn.cursor()
-            # Cabecera
+            # 1. Cabecera del préstamo
             cursor.execute("""
                 INSERT OR REPLACE INTO prestamos (
                     id_prestamo, fecha_prestamo, estado, rut_socio,
@@ -353,7 +380,7 @@ class RepositorioBibliotecaBD:
                 len(prestamo.items_prestamo)
             ))
 
-            # Detalles
+            # 2. Detalles del préstamo (Ítems individuales)
             for det in prestamo.items_prestamo:
                 cursor.execute("""
                     INSERT OR REPLACE INTO detalles_prestamo (
@@ -373,13 +400,13 @@ class RepositorioBibliotecaBD:
                     1 if det.devuelto else 0
                 ))
 
-            # Actualizar estado de los materiales en la tabla materiales
+            # 3. Sincronizar disponibilidad del material en la tabla materiales
             for det in prestamo.items_prestamo:
                 cursor.execute("""
                     UPDATE materiales SET prestado = ? WHERE codigo = ?
                 """, (1 if not det.devuelto else 0, det.material.codigo))
 
-            # Actualizar saldo de multas del socio en BD
+            # 4. Sincronizar multas y estado del socio en la tabla socios
             cursor.execute("""
                 UPDATE socios SET
                     tiene_multa_pendiente = ?,
@@ -401,7 +428,7 @@ class RepositorioBibliotecaBD:
                 conn.close()
 
     def obtener_prestamo(self, id_prestamo: int) -> Optional[Dict[str, Any]]:
-        """Obtiene la cabecera y lista de detalles de un préstamo."""
+        """Recupera la cabecera y todas las líneas de detalle de un préstamo."""
         conn = self._get_connection()
         try:
             cursor = conn.cursor()
@@ -411,7 +438,10 @@ class RepositorioBibliotecaBD:
                 return None
             
             prestamo_dict = dict(row)
-            cursor.execute("SELECT * FROM detalles_prestamo WHERE id_prestamo = ? ORDER BY id_detalle ASC", (id_prestamo,))
+            cursor.execute(
+                "SELECT * FROM detalles_prestamo WHERE id_prestamo = ? ORDER BY id_detalle ASC",
+                (id_prestamo,)
+            )
             prestamo_dict["detalles"] = [dict(d) for d in cursor.fetchall()]
             return prestamo_dict
         finally:
@@ -419,7 +449,7 @@ class RepositorioBibliotecaBD:
                 conn.close()
 
     def listar_prestamos(self) -> List[Dict[str, Any]]:
-        """Retorna el listado de préstamos con sus detalles."""
+        """Retorna el registro histórico de préstamos con sus respectivos ítems."""
         conn = self._get_connection()
         try:
             cursor = conn.cursor()
@@ -438,7 +468,9 @@ class RepositorioBibliotecaBD:
 
     # ==================== BITÁCORA DE AUDITORÍA ====================
     def registrar_auditoria(self, usuario: str, accion: str) -> None:
-        """Registra un evento con fecha y hora en el log de auditoría."""
+        """
+        Inserta un registro cronológico inmutable en log_auditoria para trazabilidad legal y administrativa.
+        """
         conn = self._get_connection()
         try:
             cursor = conn.cursor()
@@ -458,7 +490,7 @@ class RepositorioBibliotecaBD:
                 conn.close()
 
     def obtener_logs_auditoria(self, limite: int = 50) -> List[Dict[str, Any]]:
-        """Consulta los últimos eventos registrados en la bitácora."""
+        """Consulta los eventos de auditoría más recientes ordenados descendentemente."""
         conn = self._get_connection()
         try:
             cursor = conn.cursor()

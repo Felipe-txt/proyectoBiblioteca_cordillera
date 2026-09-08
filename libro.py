@@ -1,14 +1,28 @@
 """
-Módulo Libro
-Representa los libros del catálogo de la biblioteca.
-Política: 14 días de préstamo base y hasta 1 renovación autorizada (14 días más).
+========================================================================================
+MÓDULO: libro.py
+ROL EN EL PROYECTO:
+    Subclase concreta de Material que representa los libros físicos del catálogo.
+    
+    Implementación de Políticas Polimórficas:
+    - dias_prestamo(): 14 días corridos.
+    - permite_renovacion(): True (los libros son el único material general renovable).
+    - max_renovaciones(): 1 renovación (otorga 14 días adicionales, totalizando máx. 28 días).
+    
+    Atributos Propios:
+    - isbn: Identificador bibliográfico internacional estandarizado.
+    - editorial: Casa editora del volumen.
+    - numero_paginas: Extensión de la obra.
+========================================================================================
 """
 
 from material import Material
 
 
 class Libro(Material):
-    """Subclase representativa de libros impresos."""
+    """
+    Subclase que modela libros impresos tradicionales.
+    """
 
     def __init__(
         self,
@@ -34,28 +48,33 @@ class Libro(Material):
         self._editorial: str = editorial.strip()
         self._numero_paginas: int = int(numero_paginas)
 
+    # ==================== PROPIEDADES ESPECÍFICAS ====================
     @property
     def isbn(self) -> str:
+        """Código ISBN (International Standard Book Number)."""
         return self._isbn
 
     @property
     def editorial(self) -> str:
+        """Sello editorial que publicó la edición."""
         return self._editorial
 
     @property
     def numero_paginas(self) -> int:
+        """Cantidad total de páginas numeradas."""
         return self._numero_paginas
 
+    # ==================== IMPLEMENTACIÓN DE MÉTODOS POLIMÓRFICOS ====================
     def dias_prestamo(self) -> int:
-        """Los libros se prestan por 14 días corridos."""
+        """Política: Los libros se prestan por 14 días corridos (2 semanas)."""
         return 14
 
     def permite_renovacion(self) -> bool:
-        """Los libros sí admiten renovación."""
+        """Política: Sí admite extensión de plazo si no está reservado."""
         return True
 
     def max_renovaciones(self) -> int:
-        """Límite de 1 renovación adicional."""
+        """Política: Límite estricto de 1 renovación (14 días más)."""
         return 1
 
     def __str__(self) -> str:

@@ -1,7 +1,21 @@
 """
-Módulo Administradora
-Representa al usuario con máximo nivel de privilegios en el sistema bibliotecario.
-Posee atribuciones exclusivas como dar de alta/baja catálogo y condonación de multas.
+========================================================================================
+MÓDULO: administradora.py
+ROL EN EL PROYECTO:
+    Representa al usuario con máximo nivel de privilegios y responsabilidad de
+    gestión en la Biblioteca Cordillera (nivel SUPERADMIN). Hereda de Usuario.
+    
+    Responsabilidades Principales y Atribuciones Exclusivas:
+    - Alta de nuevos materiales en el catálogo (Libros, Revistas, DVDs, Extranjeros).
+    - Baja o desincorporación de materiales del inventario de la biblioteca.
+    - Condonación administrativa de multas y deudas de socios (por ejemplo, por
+      licencias médicas, pérdidas justificadas o acuerdos institucionales).
+    
+    Regla Infranqueable Asociada:
+    - Regla N°4 (Segregación de Roles): Estas acciones están estrictamente prohibidas
+      para usuarios con rol Bibliotecaria. Si alguien no autorizado intenta ejecutarlas,
+      se dispara PermisoInsuficienteError.
+========================================================================================
 """
 
 from typing import Dict, Any
@@ -11,7 +25,9 @@ from excepciones import PermisoInsuficienteError
 
 
 class Administradora(Usuario):
-    """Rol de máxima autoridad administrativa de la Biblioteca Cordillera."""
+    """
+    Subclase de Usuario con nivel de acceso 'SUPERADMIN' y facultades ejecutivas plenas.
+    """
 
     def __init__(
         self,
@@ -24,6 +40,7 @@ class Administradora(Usuario):
         nivel_acceso: str = "SUPERADMIN",
         activo: bool = True
     ):
+        # Asignamos el rol 'ADMINISTRADORA' en la clase base
         super().__init__(
             rut=rut,
             nombre_completo=nombre_completo,
@@ -38,16 +55,23 @@ class Administradora(Usuario):
 
     @property
     def nivel_acceso(self) -> str:
+        """Nivel jerárquico de autorización en la infraestructura (ej: 'SUPERADMIN')."""
         return self._nivel_acceso
 
     def dar_alta_material(self, material: Any, catalogo: Dict[str, Any]) -> None:
-        """Incorpora un nuevo ejemplar al catálogo general de la biblioteca."""
+        """
+        Incorpora un nuevo ejemplar al catálogo general de la biblioteca.
+        Valida que el usuario posea la atribución 'dar_alta_material'.
+        """
         if not self.tiene_permiso("dar_alta_material"):
             raise PermisoInsuficienteError(self._username, "dar_alta_material")
         catalogo[material.codigo] = material
 
     def eliminar_material(self, codigo_material: str, catalogo: Dict[str, Any]) -> None:
-        """Da de baja física o retira un material del catálogo."""
+        """
+        Da de baja física o retira un material del catálogo institucional.
+        Valida que el usuario posea la atribución 'eliminar_material'.
+        """
         if not self.tiene_permiso("eliminar_material"):
             raise PermisoInsuficienteError(self._username, "eliminar_material")
         cod = codigo_material.strip().upper()
@@ -56,7 +80,8 @@ class Administradora(Usuario):
 
     def condonar_multa(self, socio: Socio, motivo: str = "Condonación administrativa autorizada") -> None:
         """
-        Atribución exclusiva: Exonera deudas y multas a un socio por causas justificadas.
+        Facultad exclusiva: Exonera deudas y multas a un socio por causas justificadas.
+        Permite que un socio sancionado vuelva a solicitar préstamos.
         """
         if not self.tiene_permiso("condonar_multa"):
             raise PermisoInsuficienteError(self._username, "condonar_multa")
