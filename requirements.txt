@@ -1,0 +1,2 @@
+# El sistema utiliza la biblioteca estándar de Python 3 (sqlite3, urllib, hashlib, datetime, json, abc, unittest).
+# No se requieren dependencias externas obligatorias para su ejecución base.

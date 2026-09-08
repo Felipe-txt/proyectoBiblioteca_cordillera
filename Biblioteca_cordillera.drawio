@@ -1,0 +1,374 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-08-19T21:10:00.000Z" agent="Antigravity UML Generator Pro" version="21.0.0" type="device">
+  <diagram id="diagrama_biblioteca_cordillera_clean" name="Diagrama de Clases - Biblioteca Municipal Cordillera">
+    <mxGraphModel dx="2200" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2900" pageHeight="1900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2001" value="&amp;lt;b style='font-size:14px; color:#1A252F; letter-spacing:0.04em;'&amp;gt;1. DOMINIO DE PERSONAS &amp; SEGURIDAD&amp;lt;/b&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;span style='font-size:11px; color:#7F8C8D;'&amp;gt;Validación Módulo 11 de RUT, encapsulamiento de multas y roles con contraseñas hasheadas&amp;lt;/span&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBFBFB;strokeColor=#D5D8DC;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=16;spacingTop=12;fontFamily=Barlow,sans-serif;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="50" y="40" width="770" height="720" as="geometry" />
+        </mxCell>
+        <mxCell id="2002" value="&amp;lt;&amp;lt;abstract&amp;gt;&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;b&amp;gt;Persona&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#2980B9;strokeColor=#1F618D;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="70" y="100" width="320" height="224" as="geometry" />
+        </mxCell>
+        <mxCell id="2003" value="- rut: str&amp;lt;br/&amp;gt;- nombre_completo: str&amp;lt;br/&amp;gt;- telefono: str&amp;lt;br/&amp;gt;- email: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2002">
+          <mxGeometry y="32" width="320" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="2004" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#1F618D;" vertex="1" parent="2002">
+          <mxGeometry y="114" width="320" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2005" value="+ __init__(rut, nombre, tel, email)&amp;lt;br/&amp;gt;+ validar_rut(rut: str): bool&amp;lt;br/&amp;gt;+ _calcular_dv(cuerpo: str): str&amp;lt;br/&amp;gt;+ get_rut(): str&amp;lt;br/&amp;gt;+ get_nombre(): str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2002">
+          <mxGeometry y="122" width="320" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="2006" value="&amp;lt;b&amp;gt;Socio&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#2980B9;strokeColor=#1F618D;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="450" y="100" width="350" height="242" as="geometry" />
+        </mxCell>
+        <mxCell id="2007" value="- numero_socio: int&amp;lt;br/&amp;gt;- fecha_inscripcion: date&amp;lt;br/&amp;gt;- tiene_multa_pendiente: bool = False&amp;lt;br/&amp;gt;- monto_multa_acumulada: float = 0.0&amp;lt;br/&amp;gt;- activo: bool = True" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2006">
+          <mxGeometry y="32" width="350" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="2008" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#1F618D;" vertex="1" parent="2006">
+          <mxGeometry y="132" width="350" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2009" value="+ __init__(rut, nombre, tel, email, num_socio)&amp;lt;br/&amp;gt;+ puede_solicitar_prestamo(): bool&amp;lt;br/&amp;gt;+ registrar_multa(monto: float): void&amp;lt;br/&amp;gt;+ pagar_multa(monto: float): void&amp;lt;br/&amp;gt;+ condonar_multa(): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2006">
+          <mxGeometry y="140" width="350" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="2010" value="&amp;lt;&amp;lt;abstract&amp;gt;&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;b&amp;gt;Usuario&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#2C3E50;strokeColor=#1A252F;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="70" y="340" width="320" height="206" as="geometry" />
+        </mxCell>
+        <mxCell id="2011" value="- username: str&amp;lt;br/&amp;gt;- password_hash: str&amp;lt;br/&amp;gt;- rol: str&amp;lt;br/&amp;gt;- activo: bool = True" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2010">
+          <mxGeometry y="32" width="320" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="2012" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#1A252F;" vertex="1" parent="2010">
+          <mxGeometry y="114" width="320" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2013" value="+ __init__(rut, nombre, user, pwd, rol)&amp;lt;br/&amp;gt;+ autenticar(password: str): bool&amp;lt;br/&amp;gt;+ _hash_password(raw_pwd: str): str&amp;lt;br/&amp;gt;+ tiene_permiso(accion: str): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2010">
+          <mxGeometry y="122" width="320" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="2014" value="&amp;lt;b&amp;gt;BibliotecariaAtencion&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#2C3E50;strokeColor=#1A252F;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="70" y="560" width="350" height="152" as="geometry" />
+        </mxCell>
+        <mxCell id="2015" value="- turno: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2014">
+          <mxGeometry y="32" width="350" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="2016" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#1A252F;" vertex="1" parent="2014">
+          <mxGeometry y="60" width="350" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2017" value="+ __init__(rut, nombre, user, pwd, turno)&amp;lt;br/&amp;gt;+ registrar_prestamo(socio, materiales): Prestamo&amp;lt;br/&amp;gt;+ registrar_devolucion(prestamo, cod_mat): void&amp;lt;br/&amp;gt;+ renovar_material(prestamo, cod_mat): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2014">
+          <mxGeometry y="68" width="350" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="2018" value="&amp;lt;b&amp;gt;Administradora&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#2C3E50;strokeColor=#1A252F;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="450" y="560" width="350" height="152" as="geometry" />
+        </mxCell>
+        <mxCell id="2019" value="- nivel_acceso: str = &amp;#x27;SUPERADMIN&amp;#x27;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2018">
+          <mxGeometry y="32" width="350" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="2020" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#1A252F;" vertex="1" parent="2018">
+          <mxGeometry y="60" width="350" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2021" value="+ __init__(rut, nombre, user, pwd)&amp;lt;br/&amp;gt;+ dar_alta_material(material: Material): void&amp;lt;br/&amp;gt;+ eliminar_material(cod_mat: str): void&amp;lt;br/&amp;gt;+ condonar_multa(socio: Socio, motivo: str): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2018">
+          <mxGeometry y="68" width="350" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="2022" value="" style="endArrow=block;endSize=12;endFill=0;html=1;rounded=1;strokeWidth=1.8;strokeColor=#2C3E50;edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.4;exitDx=0;exitDy=0;entryX=1;entryY=0.4;entryDx=0;entryDy=0;" edge="1" parent="1" source="2006" target="2002">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2023" value="" style="endArrow=block;endSize=12;endFill=0;html=1;rounded=1;strokeWidth=1.8;strokeColor=#2C3E50;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="2010" target="2002">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2024" value="" style="endArrow=block;endSize=12;endFill=0;html=1;rounded=1;strokeWidth=1.8;strokeColor=#2C3E50;edgeStyle=orthogonalEdgeStyle;exitX=0.4;exitY=0;exitDx=0;exitDy=0;entryX=0.4;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="2014" target="2010">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2025" value="" style="endArrow=block;endSize=12;endFill=0;html=1;rounded=1;strokeWidth=1.8;strokeColor=#2C3E50;edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.4;exitDx=0;exitDy=0;entryX=1;entryY=0.8;entryDx=0;entryDy=0;" edge="1" parent="1" source="2018" target="2010">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2026" value="&amp;lt;b style='font-size:14px; color:#1A252F; letter-spacing:0.04em;'&amp;gt;2. TRANSACCIÓN DE PRÉSTAMOS &amp; DETALLE&amp;lt;/b&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;span style='font-size:11px; color:#7F8C8D;'&amp;gt;Préstamo único que agrupa múltiples ítems solicitados en una visita con trazabilidad individual&amp;lt;/span&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBFBFB;strokeColor=#D5D8DC;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=16;spacingTop=12;fontFamily=Barlow,sans-serif;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="850" y="40" width="830" height="720" as="geometry" />
+        </mxCell>
+        <mxCell id="2027" value="&amp;lt;b&amp;gt;Prestamo&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#D35400;strokeColor=#A04000;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="880" y="200" width="370" height="296" as="geometry" />
+        </mxCell>
+        <mxCell id="2028" value="- id_prestamo: int&amp;lt;br/&amp;gt;- fecha_prestamo: datetime&amp;lt;br/&amp;gt;- estado: str = &amp;#x27;ACTIVO&amp;#x27;&amp;lt;br/&amp;gt;- socio: Socio&amp;lt;br/&amp;gt;- bibliotecaria: BibliotecariaAtencion&amp;lt;br/&amp;gt;- items_prestamo: List[DetallePrestamo]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2027">
+          <mxGeometry y="32" width="370" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="2029" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#A04000;" vertex="1" parent="2027">
+          <mxGeometry y="150" width="370" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2030" value="+ __init__(id_p, socio, bibliotecaria)&amp;lt;br/&amp;gt;+ agregar_item(mat: Material): DetallePrestamo&amp;lt;br/&amp;gt;+ registrar_devolucion_item(cod_mat, fecha): void&amp;lt;br/&amp;gt;+ renovar_item(cod_mat: str): bool&amp;lt;br/&amp;gt;+ esta_completamente_devuelto(): bool&amp;lt;br/&amp;gt;+ calcular_multa_total(fecha_consulta): float&amp;lt;br/&amp;gt;+ cerrar_prestamo(): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2027">
+          <mxGeometry y="158" width="370" height="136" as="geometry" />
+        </mxCell>
+        <mxCell id="2031" value="&amp;lt;b&amp;gt;DetallePrestamo&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#D35400;strokeColor=#A04000;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1300" y="200" width="360" height="278" as="geometry" />
+        </mxCell>
+        <mxCell id="2032" value="- id_detalle: int&amp;lt;br/&amp;gt;- material: Material&amp;lt;br/&amp;gt;- dias_prestamo_otorgados: int&amp;lt;br/&amp;gt;- fecha_devolucion_esperada: date&amp;lt;br/&amp;gt;- fecha_devolucion_real: Optional[date]&amp;lt;br/&amp;gt;- cantidad_renovaciones: int = 0&amp;lt;br/&amp;gt;- devuelto: bool = False" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2031">
+          <mxGeometry y="32" width="360" height="136" as="geometry" />
+        </mxCell>
+        <mxCell id="2033" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#A04000;" vertex="1" parent="2031">
+          <mxGeometry y="168" width="360" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2034" value="+ __init__(id_det, material, fecha_inicio)&amp;lt;br/&amp;gt;+ renovar(): bool&amp;lt;br/&amp;gt;+ registrar_devolucion(fecha: date): void&amp;lt;br/&amp;gt;+ calcular_dias_atraso(fecha_actual): int&amp;lt;br/&amp;gt;+ esta_vencido(fecha_actual: date): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2031">
+          <mxGeometry y="176" width="360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="2035" value="contiene líneas" style="startArrow=diamondThin;startSize=14;startFill=1;endArrow=none;html=1;rounded=1;strokeWidth=1.8;strokeColor=#1A252F;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="2027" target="2031">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2036" value="1" style="resizable=0;html=1;align=left;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;fontColor=#2C3E50;fontStyle=1;" connectable="0" vertex="1" parent="2035">
+          <mxGeometry x="-0.8" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2037" value="1..*" style="resizable=0;html=1;align=right;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;fontColor=#2C3E50;fontStyle=1;" connectable="0" vertex="1" parent="2035">
+          <mxGeometry x="0.8" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2038" value="solicitado por" style="endArrow=open;endSize=10;html=1;rounded=1;strokeWidth=1.4;strokeColor=#34495E;edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.8;entryDx=0;entryDy=0;" edge="1" parent="1" source="2027" target="2006">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2039" value="0..*" style="resizable=0;html=1;align=left;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;fontColor=#2C3E50;fontStyle=1;" connectable="0" vertex="1" parent="2038">
+          <mxGeometry x="-0.8" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2040" value="1" style="resizable=0;html=1;align=right;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;fontColor=#2C3E50;fontStyle=1;" connectable="0" vertex="1" parent="2038">
+          <mxGeometry x="0.8" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2041" value="atendido por" style="endArrow=open;endSize=10;html=1;rounded=1;strokeWidth=1.4;strokeColor=#34495E;edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="2027" target="2014">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2042" value="0..*" style="resizable=0;html=1;align=left;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;fontColor=#2C3E50;fontStyle=1;" connectable="0" vertex="1" parent="2041">
+          <mxGeometry x="-0.8" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2043" value="1" style="resizable=0;html=1;align=right;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;fontColor=#2C3E50;fontStyle=1;" connectable="0" vertex="1" parent="2041">
+          <mxGeometry x="0.8" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2044" value="&amp;lt;b style='font-size:14px; color:#1A252F; letter-spacing:0.04em;'&amp;gt;3. DOMINIO DE MATERIALES (POLIMORFISMO) &amp; API DÓLAR&amp;lt;/b&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;span style='font-size:11px; color:#7F8C8D;'&amp;gt;Duración y renovación encapsuladas por tipo de material y cálculo de reposición en USD&amp;lt;/span&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBFBFB;strokeColor=#D5D8DC;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=16;spacingTop=12;fontFamily=Barlow,sans-serif;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="1710" y="40" width="1130" height="720" as="geometry" />
+        </mxCell>
+        <mxCell id="2045" value="&amp;lt;&amp;lt;abstract&amp;gt;&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;b&amp;gt;Material&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#C0392B;strokeColor=#962D22;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1960" y="90" width="380" height="314" as="geometry" />
+        </mxCell>
+        <mxCell id="2046" value="- codigo: str&amp;lt;br/&amp;gt;- titulo: str&amp;lt;br/&amp;gt;- anio_publicacion: int&amp;lt;br/&amp;gt;- autor_o_creador: str&amp;lt;br/&amp;gt;# _prestado: bool = False&amp;lt;br/&amp;gt;- precio_base_reposicion: float" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2045">
+          <mxGeometry y="32" width="380" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="2047" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#962D22;" vertex="1" parent="2045">
+          <mxGeometry y="150" width="380" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2048" value="+ __init__(codigo, titulo, autor, anio, precio)&amp;lt;br/&amp;gt;+ dias_prestamo(): int {abstract}&amp;lt;br/&amp;gt;+ permite_renovacion(): bool {abstract}&amp;lt;br/&amp;gt;+ max_renovaciones(): int {abstract}&amp;lt;br/&amp;gt;+ prestar(): void&amp;lt;br/&amp;gt;+ devolver(): void&amp;lt;br/&amp;gt;+ esta_prestado(): bool&amp;lt;br/&amp;gt;+ calcular_valor_reposicion(): float" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2045">
+          <mxGeometry y="158" width="380" height="154" as="geometry" />
+        </mxCell>
+        <mxCell id="2049" value="presta" style="endArrow=open;endSize=10;html=1;rounded=1;strokeWidth=1.4;strokeColor=#34495E;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.6;entryDx=0;entryDy=0;" edge="1" parent="1" source="2031" target="2045">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2050" value="*" style="resizable=0;html=1;align=left;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;fontColor=#2C3E50;fontStyle=1;" connectable="0" vertex="1" parent="2049">
+          <mxGeometry x="-0.8" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2051" value="1" style="resizable=0;html=1;align=right;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;fontColor=#2C3E50;fontStyle=1;" connectable="0" vertex="1" parent="2049">
+          <mxGeometry x="0.8" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2052" value="&amp;lt;b&amp;gt;Libro&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#C0392B;strokeColor=#962D22;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1730" y="390" width="240" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="2053" value="- isbn: str&amp;lt;br/&amp;gt;- editorial: str&amp;lt;br/&amp;gt;- numero_paginas: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2052">
+          <mxGeometry y="32" width="240" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="2054" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#962D22;" vertex="1" parent="2052">
+          <mxGeometry y="96" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2055" value="+ dias_prestamo() -&amp;gt; 14 d&amp;lt;br/&amp;gt;+ permite_renovacion() -&amp;gt; True&amp;lt;br/&amp;gt;+ max_renovaciones() -&amp;gt; 1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2052">
+          <mxGeometry y="104" width="240" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="2056" value="&amp;lt;b&amp;gt;Revista&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#C0392B;strokeColor=#962D22;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1990" y="390" width="240" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="2057" value="- issn: str&amp;lt;br/&amp;gt;- numero_edicion: int&amp;lt;br/&amp;gt;- mes_publicacion: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2056">
+          <mxGeometry y="32" width="240" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="2058" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#962D22;" vertex="1" parent="2056">
+          <mxGeometry y="96" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2059" value="+ dias_prestamo() -&amp;gt; 7 d&amp;lt;br/&amp;gt;+ permite_renovacion() -&amp;gt; False&amp;lt;br/&amp;gt;+ max_renovaciones() -&amp;gt; 0" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2056">
+          <mxGeometry y="104" width="240" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="2060" value="&amp;lt;b&amp;gt;MaterialMultimedia&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#C0392B;strokeColor=#962D22;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="2250" y="390" width="250" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="2061" value="- formato: str (DVD/CD)&amp;lt;br/&amp;gt;- duracion_minutos: int&amp;lt;br/&amp;gt;- clasificacion_edad: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2060">
+          <mxGeometry y="32" width="250" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="2062" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#962D22;" vertex="1" parent="2060">
+          <mxGeometry y="96" width="250" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2063" value="+ dias_prestamo() -&amp;gt; 3 d&amp;lt;br/&amp;gt;+ permite_renovacion() -&amp;gt; False&amp;lt;br/&amp;gt;+ max_renovaciones() -&amp;gt; 0" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2060">
+          <mxGeometry y="104" width="250" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="2064" value="&amp;lt;b&amp;gt;MaterialExtranjero&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#27AE60;strokeColor=#1E8449;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="2520" y="390" width="290" height="134" as="geometry" />
+        </mxCell>
+        <mxCell id="2065" value="- precio_usd: float&amp;lt;br/&amp;gt;- recargo_aduanero_pct: float = 0.06" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2064">
+          <mxGeometry y="32" width="290" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="2066" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#1E8449;" vertex="1" parent="2064">
+          <mxGeometry y="78" width="290" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2067" value="+ get_precio_usd(): float&amp;lt;br/&amp;gt;+ calcular_valor_reposicion(dolar): float" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2064">
+          <mxGeometry y="86" width="290" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="2068" value="" style="endArrow=block;endSize=12;endFill=0;html=1;rounded=1;strokeWidth=1.8;strokeColor=#2C3E50;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.2;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="2052" target="2045">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2069" value="" style="endArrow=block;endSize=12;endFill=0;html=1;rounded=1;strokeWidth=1.8;strokeColor=#2C3E50;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.4;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="2056" target="2045">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2070" value="" style="endArrow=block;endSize=12;endFill=0;html=1;rounded=1;strokeWidth=1.8;strokeColor=#2C3E50;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.6;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="2060" target="2045">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2071" value="" style="endArrow=block;endSize=12;endFill=0;html=1;rounded=1;strokeWidth=1.8;strokeColor=#2C3E50;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.85;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="2064" target="2045">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2072" value="&amp;lt;&amp;lt;External Service&amp;gt;&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;b&amp;gt;ServicioDolarAPI&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#8E44AD;strokeColor=#6C3483;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="2520" y="570" width="290" height="152" as="geometry" />
+        </mxCell>
+        <mxCell id="2073" value="- endpoint_url: str&amp;lt;br/&amp;gt;- cache_valor: float = 0.0&amp;lt;br/&amp;gt;- ultima_act: datetime = None" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2072">
+          <mxGeometry y="32" width="290" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="2074" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#6C3483;" vertex="1" parent="2072">
+          <mxGeometry y="96" width="290" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2075" value="+ obtener_valor_dolar(): float&amp;lt;br/&amp;gt;+ _consumir_api_mindicador(): float" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2072">
+          <mxGeometry y="104" width="290" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="2076" value="&lt;&lt;usa cotización&gt;&gt;" style="endArrow=open;endSize=10;dashed=1;html=1;rounded=1;strokeWidth=1.4;strokeColor=#7F8C8D;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="2064" target="2072">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2077" value="&amp;lt;b style='font-size:14px; color:#1A252F; letter-spacing:0.04em;'&amp;gt;4. CONTROLADOR &amp; PERSISTENCIA EN BASE DE DATOS&amp;lt;/b&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;span style='font-size:11px; color:#7F8C8D;'&amp;gt;Fachada del sistema para coordinar operaciones y repositorio para almacenamiento persistente&amp;lt;/span&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBFBFB;strokeColor=#D5D8DC;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=16;spacingTop=12;fontFamily=Barlow,sans-serif;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="50" y="790" width="1130" height="390" as="geometry" />
+        </mxCell>
+        <mxCell id="2078" value="&amp;lt;&amp;lt;Façade / Controller&amp;gt;&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;b&amp;gt;SistemaBiblioteca&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#16A085;strokeColor=#117864;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="70" y="850" width="540" height="314" as="geometry" />
+        </mxCell>
+        <mxCell id="2079" value="- nombre_biblioteca: str = &amp;#x27;Biblioteca Municipal Cordillera&amp;#x27;&amp;lt;br/&amp;gt;- catalogo_materiales: Dict[str, Material]&amp;lt;br/&amp;gt;- registro_socios: Dict[str, Socio]&amp;lt;br/&amp;gt;- registro_prestamos: List[Prestamo]&amp;lt;br/&amp;gt;- usuarios_sistema: Dict[str, Usuario]&amp;lt;br/&amp;gt;- servicio_dolar: ServicioDolarAPI" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2078">
+          <mxGeometry y="32" width="540" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="2080" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#117864;" vertex="1" parent="2078">
+          <mxGeometry y="150" width="540" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2081" value="+ inscribir_socio(rut, nombre, tel, email): Socio&amp;lt;br/&amp;gt;+ crear_prestamo(rut_socio, cods_mat, usuario_atencion): Prestamo&amp;lt;br/&amp;gt;+ procesar_devolucion(id_p, cod_mat, usuario_atencion): void&amp;lt;br/&amp;gt;+ renovar_material_prestamo(id_p, cod_mat): bool&amp;lt;br/&amp;gt;+ alta_nuevo_material(usuario_admin, material: Material): void&amp;lt;br/&amp;gt;+ baja_material(usuario_admin, cod_mat: str): void&amp;lt;br/&amp;gt;+ condonar_multa_socio(usuario_admin, rut_socio, motivo): void&amp;lt;br/&amp;gt;+ registrar_perdida_material(rut_socio, cod_mat): float" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2078">
+          <mxGeometry y="158" width="540" height="154" as="geometry" />
+        </mxCell>
+        <mxCell id="2082" value="&amp;lt;&amp;lt;Database CRUD Handler&amp;gt;&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;b&amp;gt;RepositorioBibliotecaBD&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#2C3E50;strokeColor=#1A252F;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="670" y="850" width="480" height="188" as="geometry" />
+        </mxCell>
+        <mxCell id="2083" value="- db_connection_string: str&amp;lt;br/&amp;gt;- transaccion_activa: bool = False" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2082">
+          <mxGeometry y="32" width="480" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="2084" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#1A252F;" vertex="1" parent="2082">
+          <mxGeometry y="78" width="480" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2085" value="+ guardar_prestamo(prestamo: Prestamo): bool&amp;lt;br/&amp;gt;+ obtener_prestamo(id_prestamo: int): Prestamo&amp;lt;br/&amp;gt;+ actualizar_estado_material(codigo: str, estado: str): bool&amp;lt;br/&amp;gt;+ guardar_socio(socio: Socio): bool&amp;lt;br/&amp;gt;+ registrar_auditoria(usuario: str, accion: str): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2082">
+          <mxGeometry y="86" width="480" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="2086" value="administra" style="startArrow=diamondThin;startSize=14;startFill=0;endArrow=none;html=1;rounded=1;strokeWidth=1.8;strokeColor=#1A252F;edgeStyle=orthogonalEdgeStyle;exitX=0.7;exitY=0;exitDx=0;exitDy=0;entryX=0.3;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="2078" target="2027">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2087" value="1" style="resizable=0;html=1;align=left;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;fontColor=#2C3E50;fontStyle=1;" connectable="0" vertex="1" parent="2086">
+          <mxGeometry x="-0.8" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2088" value="0..*" style="resizable=0;html=1;align=right;verticalAlign=bottom;labelBackgroundColor=none;fontSize=10;fontColor=#2C3E50;fontStyle=1;" connectable="0" vertex="1" parent="2086">
+          <mxGeometry x="0.8" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2089" value="persiste con" style="endArrow=open;endSize=10;html=1;rounded=1;strokeWidth=1.4;strokeColor=#34495E;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.4;exitDx=0;exitDy=0;entryX=0;entryY=0.4;entryDx=0;entryDy=0;" edge="1" parent="1" source="2078" target="2082">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2090" value="&amp;lt;b style='font-size:14px; color:#1A252F; letter-spacing:0.04em;'&amp;gt;5. JERARQUÍA DE EXCEPCIONES &amp; REGLAS INFRANQUEABLES&amp;lt;/b&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;span style='font-size:11px; color:#7F8C8D;'&amp;gt;Reglas de negocio modeladas como excepciones propias y resumen de políticas de biblioteca&amp;lt;/span&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBFBFB;strokeColor=#D5D8DC;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=16;spacingTop=12;fontFamily=Barlow,sans-serif;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="1210" y="790" width="1630" height="390" as="geometry" />
+        </mxCell>
+        <mxCell id="2091" value="&amp;lt;&amp;lt;Exception&amp;gt;&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;b&amp;gt;BibliotecaError&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#7F8C8D;strokeColor=#5D6D7E;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="850" width="220" height="98" as="geometry" />
+        </mxCell>
+        <mxCell id="2092" value="- mensaje: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2091">
+          <mxGeometry y="32" width="220" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="2093" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#5D6D7E;" vertex="1" parent="2091">
+          <mxGeometry y="60" width="220" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2094" value="+ __str__(): str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2091">
+          <mxGeometry y="68" width="220" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="2095" value="&amp;lt;&amp;lt;Exception&amp;gt;&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;b&amp;gt;SocioConMultaPendienteError&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#E74C3C;strokeColor=#C0392B;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="850" width="300" height="116" as="geometry" />
+        </mxCell>
+        <mxCell id="2096" value="- rut_socio: str&amp;lt;br/&amp;gt;- monto_deuda: float" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2095">
+          <mxGeometry y="32" width="300" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="2097" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#C0392B;" vertex="1" parent="2095">
+          <mxGeometry y="78" width="300" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2098" value="+ __init__(rut, monto)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2095">
+          <mxGeometry y="86" width="300" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="2099" value="&amp;lt;&amp;lt;Exception&amp;gt;&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;b&amp;gt;MaterialYaPrestadoError&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#E74C3C;strokeColor=#C0392B;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1830" y="850" width="280" height="98" as="geometry" />
+        </mxCell>
+        <mxCell id="2100" value="- codigo_material: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2099">
+          <mxGeometry y="32" width="280" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="2101" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#C0392B;" vertex="1" parent="2099">
+          <mxGeometry y="60" width="280" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2102" value="+ __init__(codigo)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2099">
+          <mxGeometry y="68" width="280" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="2103" value="&amp;lt;&amp;lt;Exception&amp;gt;&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;b&amp;gt;RenovacionNoPermitidaError&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#E74C3C;strokeColor=#C0392B;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="2140" y="850" width="290" height="116" as="geometry" />
+        </mxCell>
+        <mxCell id="2104" value="- codigo_material: str&amp;lt;br/&amp;gt;- razon: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2103">
+          <mxGeometry y="32" width="290" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="2105" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#C0392B;" vertex="1" parent="2103">
+          <mxGeometry y="78" width="290" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2106" value="+ __init__(codigo, razon)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2103">
+          <mxGeometry y="86" width="290" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="2107" value="&amp;lt;&amp;lt;Exception&amp;gt;&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;b&amp;gt;RutInvalidoError&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#E74C3C;strokeColor=#C0392B;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="2460" y="850" width="240" height="98" as="geometry" />
+        </mxCell>
+        <mxCell id="2108" value="- rut_ingresado: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2107">
+          <mxGeometry y="32" width="240" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="2109" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#C0392B;" vertex="1" parent="2107">
+          <mxGeometry y="60" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2110" value="+ __init__(rut)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2107">
+          <mxGeometry y="68" width="240" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="2111" value="&amp;lt;&amp;lt;Exception&amp;gt;&amp;gt;&amp;lt;br/&amp;gt;&amp;lt;b&amp;gt;PermisoInsuficienteError&amp;lt;/b&amp;gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#E74C3C;strokeColor=#C0392B;fontColor=#FFFFFF;fontSize=12;fontFamily=Barlow,Helvetica;swimlaneFillColor=#FFFFFF;rounded=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="2460" y="970" width="240" height="116" as="geometry" />
+        </mxCell>
+        <mxCell id="2112" value="- usuario: str&amp;lt;br/&amp;gt;- accion: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#2C3E50;" vertex="1" parent="2111">
+          <mxGeometry y="32" width="240" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="2113" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#C0392B;" vertex="1" parent="2111">
+          <mxGeometry y="78" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="2114" value="+ __init__(user, accion)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;fontFamily=JetBrains Mono,Consolas,Courier;fontColor=#1A252F;" vertex="1" parent="2111">
+          <mxGeometry y="86" width="240" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="2115" value="" style="endArrow=block;endSize=12;endFill=0;html=1;rounded=1;strokeWidth=1.8;strokeColor=#2C3E50;edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="2095" target="2091">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2116" value="" style="endArrow=block;endSize=12;endFill=0;html=1;rounded=1;strokeWidth=1.8;strokeColor=#2C3E50;edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.6;entryDx=0;entryDy=0;" edge="1" parent="1" source="2099" target="2091">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2117" value="" style="endArrow=block;endSize=12;endFill=0;html=1;rounded=1;strokeWidth=1.8;strokeColor=#2C3E50;edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.8;entryDx=0;entryDy=0;" edge="1" parent="1" source="2103" target="2091">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2118" value="" style="endArrow=block;endSize=12;endFill=0;html=1;rounded=1;strokeWidth=1.8;strokeColor=#2C3E50;edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="2107" target="2091">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2119" value="" style="endArrow=block;endSize=12;endFill=0;html=1;rounded=1;strokeWidth=1.8;strokeColor=#2C3E50;edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.2;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="2111" target="2091">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2120" value="&amp;lt;b style='font-size:12px; color:#9A7D0A; text-transform:uppercase;'&amp;gt;POLÍTICAS DE PRÉSTAMO Y RENOVACIÓN&amp;lt;/b&amp;gt;&amp;lt;hr style='border:0; border-top:1px solid #F1C40F; margin:5px 0;'/&amp;gt;&amp;lt;div style='font-size:11px; color:#2C3E50; line-height:1.45;'&amp;gt;&amp;bull; Libros: 14 días | Permite hasta 1 renovación adicional (14 días más).&amp;lt;br/&amp;gt;&amp;bull; Revistas: 7 días | No permite renovaciones bajo ninguna circunstancia.&amp;lt;br/&amp;gt;&amp;bull; Material Multimedia / DVDs: 3 días | No permite renovación por alta rotación de público.&amp;lt;br/&amp;gt;&amp;bull; Pérdida de Material Extranjero: Liquidado al valor oficial del dólar del día mediante API.&amp;lt;/div&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9E7;strokeColor=#F1C40F;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=14;spacingRight=14;spacingTop=10;spacingBottom=10;fontFamily=Barlow,sans-serif;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="1000" width="580" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="2121" value="&amp;lt;b style='font-size:12px; color:#922B21; text-transform:uppercase;'&amp;gt;REGLAS INFRANQUEABLES &amp; SEGREGACIÓN DE ROLES&amp;lt;/b&amp;gt;&amp;lt;hr style='border:0; border-top:1px solid #E74C3C; margin:5px 0;'/&amp;gt;&amp;lt;div style='font-size:11px; color:#2C3E50; line-height:1.45;'&amp;gt;&amp;bull; Regla 1 (Bloqueante): PROHIBIDO prestar si el Socio tiene multa pendiente sin pagar.&amp;lt;br/&amp;gt;&amp;bull; Regla 2 (Bloqueante): PROHIBIDO prestar material que ya está en poder de otro socio.&amp;lt;br/&amp;gt;&amp;bull; Regla 3 (Integridad): Validación estricta de RUT con algoritmo Módulo 11.&amp;lt;br/&amp;gt;&amp;bull; Segregación: Solo la Administradora puede dar de alta/baja catálogo y condonar multas.&amp;lt;/div&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=14;spacingRight=14;spacingTop=10;spacingBottom=10;fontFamily=Barlow,sans-serif;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1840" y="1000" width="600" height="160" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
