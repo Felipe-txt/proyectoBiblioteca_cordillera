@@ -1,0 +1,206 @@
+{
+    "socios": [
+        {
+            "rut": "18.234.567-9",
+            "nombre_completo": "Andrés Castro Morán",
+            "telefono": "+56988776655",
+            "email": "andres.castro@inacap.cl",
+            "numero_socio": 1,
+            "fecha_inscripcion": "2026-10-04",
+            "tiene_multa_pendiente": false,
+            "monto_multa_acumulada": 0.0,
+            "activo": true
+        },
+        {
+            "rut": "15.432.109-8",
+            "nombre_completo": "Beatriz Fuentes Lara",
+            "telefono": "+56977665544",
+            "email": "beatriz.fuentes@gmail.com",
+            "numero_socio": 2,
+            "fecha_inscripcion": "2026-10-04",
+            "tiene_multa_pendiente": false,
+            "monto_multa_acumulada": 0.0,
+            "activo": true
+        },
+        {
+            "rut": "12.345.678-5",
+            "nombre_completo": "Diego Morales Peña",
+            "telefono": "+56966554433",
+            "email": "diego.morales@empresa.cl",
+            "numero_socio": 3,
+            "fecha_inscripcion": "2026-10-04",
+            "tiene_multa_pendiente": true,
+            "monto_multa_acumulada": 2500.0,
+            "activo": true
+        }
+    ],
+    "usuarios": [
+        {
+            "username": "admin",
+            "rut": "19.876.543-0",
+            "nombre_completo": "Camila Valenzuela Pavez",
+            "telefono": "+56911223344",
+            "email": "cvalenzuela@cordillera.cl",
+            "password_hash": "aacbde9f6f17dfe9dc0476154417ac7ab3cc7485d985b3da41295a488740ce53",
+            "rol": "ADMINISTRADORA (SUPERADMIN)",
+            "turno": null,
+            "nivel_acceso": "SUPERADMIN"
+        },
+        {
+            "username": "vrojas",
+            "rut": "17.654.321-3",
+            "nombre_completo": "Valentina Rojas Morales",
+            "telefono": "+56922334455",
+            "email": "vrojas@cordillera.cl",
+            "password_hash": "4df2862cbd335cbfe404c7260bd26648f542468e80e5bfbfb08596c62020465a",
+            "rol": "BIBLIOTECARIA_ATENCION (Turno Mañana)",
+            "turno": "Mañana",
+            "nivel_acceso": null
+        },
+        {
+            "username": "isoto",
+            "rut": "16.543.210-K",
+            "nombre_completo": "Ignacio Soto Silva",
+            "telefono": "+56933445566",
+            "email": "isoto@cordillera.cl",
+            "password_hash": "3e7a8875dea5537a043feca92c33184e03530729493dce8f4de94fcf3649a16b",
+            "rol": "BIBLIOTECARIA_ATENCION (Turno Tarde)",
+            "turno": "Tarde",
+            "nivel_acceso": null
+        }
+    ],
+    "catalogo": [
+        {
+            "codigo": "LIB-001",
+            "titulo": "Cien Años de Soledad",
+            "autor_o_creador": "Gabriel García Márquez",
+            "anio_publicacion": 1967,
+            "precio_base_reposicion": 28000.0,
+            "tipo_material": "LIBRO",
+            "prestado": true,
+            "isbn": "978-0307474728",
+            "editorial": "Sudamericana",
+            "numero_paginas": 471
+        },
+        {
+            "codigo": "LIB-002",
+            "titulo": "El Quijote de la Mancha",
+            "autor_o_creador": "Miguel de Cervantes",
+            "anio_publicacion": 1605,
+            "precio_base_reposicion": 32000.0,
+            "tipo_material": "LIBRO",
+            "prestado": false,
+            "isbn": "978-8420412146",
+            "editorial": "Alfaguara",
+            "numero_paginas": 863
+        },
+        {
+            "codigo": "REV-001",
+            "titulo": "National Geographic en Español",
+            "autor_o_creador": "Varios Autores",
+            "anio_publicacion": 2024,
+            "precio_base_reposicion": 12000.0,
+            "tipo_material": "REVISTA",
+            "prestado": true,
+            "issn": "0027-9358",
+            "numero_edicion": 145,
+            "mes_publicacion": "Agosto 2024"
+        },
+        {
+            "codigo": "DVD-001",
+            "titulo": "Interstellar (Edición Especial 4K)",
+            "autor_o_creador": "Christopher Nolan",
+            "anio_publicacion": 2014,
+            "precio_base_reposicion": 35000.0,
+            "tipo_material": "MATERIALMULTIMEDIA",
+            "prestado": false,
+            "formato": "DVD",
+            "duracion_minutos": 169,
+            "clasificacion_edad": "+14"
+        },
+        {
+            "codigo": "EXT-001",
+            "titulo": "Artificial Intelligence: A Modern Approach (4th Ed)",
+            "autor_o_creador": "Stuart Russell & Peter Norvig",
+            "anio_publicacion": 2020,
+            "precio_base_reposicion": 0.0,
+            "tipo_material": "MATERIALEXTRANJERO",
+            "prestado": false,
+            "precio_usd": 120.0,
+            "pais_origen": "Estados Unidos",
+            "recargo_aduanero_pct": 0.06
+        }
+    ],
+    "prestamos": [
+        {
+            "id_prestamo": 1,
+            "socio_rut": "18.234.567-9",
+            "bibliotecaria_username": "vrojas",
+            "fecha_prestamo": "2026-10-04T16:53:21.530558",
+            "estado": "ACTIVO",
+            "detalles": [
+                {
+                    "id_detalle": 1,
+                    "material_codigo": "LIB-001",
+                    "fecha_inicio": "2026-10-04",
+                    "dias_prestamo_otorgados": 14,
+                    "fecha_devolucion_esperada": "2026-10-18",
+                    "fecha_devolucion_real": null,
+                    "cantidad_renovaciones": 0,
+                    "devuelto": false
+                },
+                {
+                    "id_detalle": 2,
+                    "material_codigo": "REV-001",
+                    "fecha_inicio": "2026-10-04",
+                    "dias_prestamo_otorgados": 7,
+                    "fecha_devolucion_esperada": "2026-10-11",
+                    "fecha_devolucion_real": null,
+                    "cantidad_renovaciones": 0,
+                    "devuelto": false
+                }
+            ]
+        }
+    ],
+    "boletas": [
+        {
+            "numero": 1,
+            "tipo": "BOLETA_PRESTAMO",
+            "descripcion": "Préstamo N°0001 en mesón de atención",
+            "fecha": "2026-10-04T16:53:21.558158",
+            "estado": "EMITIDA",
+            "socio_rut": "18.234.567-9",
+            "socio_nombre": "Andrés Castro Morán",
+            "usuario_username": "vrojas",
+            "prestamo_id": 1,
+            "iva_pct": 0.0,
+            "descuento": 0.0,
+            "subtotal": 0.0,
+            "iva": 0.0,
+            "total": 0.0,
+            "lineas": [
+                {
+                    "concepto": "Préstamo: [LIB-001] Cien Años de Soledad",
+                    "cantidad": 1,
+                    "precio_unitario": 0.0,
+                    "subtotal": 0.0,
+                    "codigo_referencia": "LIB-001",
+                    "tipo_item": "PRESTAMO"
+                },
+                {
+                    "concepto": "Préstamo: [REV-001] National Geographic en Español",
+                    "cantidad": 1,
+                    "precio_unitario": 0.0,
+                    "subtotal": 0.0,
+                    "codigo_referencia": "REV-001",
+                    "tipo_item": "PRESTAMO"
+                }
+            ]
+        }
+    ],
+    "_metadatos": {
+        "version": "2.0.0",
+        "sistema": "Biblioteca Municipal Cordillera",
+        "fecha_guardado": "2026-10-04T16:53:21.570755"
+    }
+}
