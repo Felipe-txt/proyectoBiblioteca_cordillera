@@ -21,10 +21,7 @@ class Persona(ABC):
     """
 
     def __init__(self, rut: str, nombre_completo: str, telefono: str, email: str):
-        if not self.validar_rut(rut):
-            raise RutInvalidoError(rut)
-
-        self._rut: str = self._formatear_rut(rut)
+        self.rut = rut  # Valida y formatea a través del setter
         self._nombre_completo: str = nombre_completo.strip()
         self._telefono: str = telefono.strip()
         self._email: str = email.strip()
@@ -74,6 +71,19 @@ class Persona(ABC):
     def get_rut(self) -> str:
         return self._rut
 
+    def set_rut(self, nuevo_rut: str) -> None:
+        self.rut = nuevo_rut
+
+    @property
+    def rut(self) -> str:
+        return self._rut
+
+    @rut.setter
+    def rut(self, valor: str) -> None:
+        if not self.validar_rut(valor):
+            raise RutInvalidoError(valor)
+        self._rut = self._formatear_rut(valor)
+
     def get_nombre(self) -> str:
         return self._nombre_completo
 
@@ -95,10 +105,6 @@ class Persona(ABC):
 
     def set_email(self, nuevo_email: str) -> None:
         self._email = nuevo_email.strip()
-
-    @property
-    def rut(self) -> str:
-        return self._rut
 
     @property
     def nombre(self) -> str:

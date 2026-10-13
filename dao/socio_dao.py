@@ -117,3 +117,16 @@ class SocioDao(Dao):
                 activo=bool(f[8])
             ))
         return socios
+
+    def eliminar_por_rut(self, rut: str) -> None:
+        """Elimina un socio por su RUT (CRUD: Delete)."""
+        self.crear_tabla()
+        rut_limpio = rut.replace(".", "").replace("-", "").strip().upper()
+        # Buscamos la fila exacta para borrar
+        self.cursor.execute("SELECT rut FROM socios")
+        filas = self.cursor.fetchall()
+        for f in filas:
+            if f[0].replace(".", "").replace("-", "").strip().upper() == rut_limpio:
+                self.cursor.execute("DELETE FROM socios WHERE rut = ?", (f[0],))
+                self.conexion.commit()
+                return

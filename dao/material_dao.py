@@ -71,10 +71,26 @@ class MaterialDao(Dao):
         self.cursor.execute(sql, (1 if prestado else 0, codigo.strip().upper()))
         self.conexion.commit()
 
+    def modificar_titulo(self, codigo: str, nuevo_titulo: str) -> None:
+        """Modifica el título de un material manteniendo las demás propiedades."""
+        sql = "UPDATE materiales SET titulo = ? WHERE codigo = ?"
+        self.cursor.execute(sql, (nuevo_titulo.strip(), codigo.strip().upper()))
+        self.conexion.commit()
+
     def eliminar_por_codigo(self, codigo: str) -> None:
-        """Elimina un material por su código primario."""
+        """Elimina un material por su código primario y sus registros derivados en cascada."""
+        cod = codigo.strip().upper()
+        # Aseguramos borrado en tablas hijas por si foreign keys estuvieran desactivadas
+        for tabla in ["libros", "revistas", "multimedia", "extranjeros", "detalles_prestamo"]:
+            try:
+                self.cursor.execute(f"DELETE FROM {tabla} WHERE codigo = ?", (cod,))
+            except Exception:
+                try:
+                    self.cursor.execute(f"DELETE FROM {tabla} WHERE codigo_material = ?", (cod,))
+                except Exception:
+                    pass
         sql = "DELETE FROM materiales WHERE codigo = ?"
-        self.cursor.execute(sql, (codigo.strip().upper(),))
+        self.cursor.execute(sql, (cod,))
         self.conexion.commit()
 
     def listar_todos_crudos(self) -> List[Dict[str, Any]]:

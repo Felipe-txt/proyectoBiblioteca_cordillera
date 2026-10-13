@@ -36,6 +36,7 @@ try:
         PermisoInsuficienteError
     )
     from dao.json_dao import JsonDao
+    from dao.material_dao import MaterialDao
     from dao.socio_dao import SocioDao
     from dao.usuario_dao import UsuarioDao
     from dao.libro_dao import LibroDao
@@ -69,6 +70,7 @@ except ImportError:
         PermisoInsuficienteError
     )
     from json_dao import JsonDao
+    from material_dao import MaterialDao
     from socio_dao import SocioDao
     from usuario_dao import UsuarioDao
     from libro_dao import LibroDao
@@ -117,8 +119,14 @@ class SistemaBiblioteca:
         self._servicio_dolar: ServicioDolarAPI = servicio_dolar or ServicioDolarAPI()
         self._json_dao: JsonDao = JsonDao(archivo_json)
         
+        # Contadores correlativos
+        self._contador_prestamos: int = 1
+        self._contador_socios: int = 1
+        self._contador_boletas: int = 1
+
         # DAOs dedicados
         if self._conn:
+            self._material_dao = MaterialDao(self._conn)
             self._socio_dao = SocioDao(self._conn)
             self._usuario_dao = UsuarioDao(self._conn)
             self._libro_dao = LibroDao(self._conn)
@@ -128,10 +136,14 @@ class SistemaBiblioteca:
             self._prestamo_dao = PrestamoDao(self._conn)
             self._boleta_dao = BoletaDao(self._conn)
 
-        # Contadores correlativos
-        self._contador_prestamos: int = 1
-        self._contador_socios: int = 1
-        self._contador_boletas: int = 1
+            # Inicializar tablas y cargar datos existentes desde SQLite
+            conectar.inicializar_base_datos(self._conn)
+            self.cargar_datos_desde_bd()
+
+        # Si no hay materiales cargados y no es una prueba temporal en memoria, sembramos datos
+        es_memoria = getattr(self._repositorio_bd, "_is_memory", False)
+        if len(self._catalogo_materiales) == 0 and len(self._registro_socios) == 0 and not es_memoria:
+            self.sembrar_datos_iniciales()
 
     # ==================== PROPIEDADES (GETTERS) ====================
     @property
@@ -201,6 +213,9 @@ class SistemaBiblioteca:
         )
         self._registro_socios[socio.get_rut()] = socio
         
+        if hasattr(self, "_socio_dao"):
+            self._socio_dao.guardar(socio)
+            
         if self._repositorio_bd and hasattr(self._repositorio_bd, "guardar_socio"):
             self._repositorio_bd.guardar_socio(socio)
             if hasattr(self._repositorio_bd, "registrar_auditoria"):
@@ -208,8 +223,6 @@ class SistemaBiblioteca:
                     "SISTEMA",
                     f"Inscripción de Socio N°{num_socio:04d}: {socio.get_nombre()} ({socio.get_rut()})"
                 )
-        elif hasattr(self, "_socio_dao"):
-            self._socio_dao.guardar(socio)
             
         return socio
 
@@ -219,22 +232,48 @@ class SistemaBiblioteca:
         for s in self._registro_socios.values():
             if s.get_rut().replace(".", "").replace("-", "").strip().upper() == rut_limpio:
                 return s
+        # Búsqueda de rescate en la BD mediante DAO
+        if hasattr(self, "_socio_dao"):
+            s_db = self._socio_dao.obtener_por_rut(rut)
+            if s_db:
+                self._registro_socios[s_db.get_rut().replace(".", "").replace("-", "").strip().upper()] = s_db
+                return s_db
         raise SocioNoEncontradoError(rut)
+
+    def registrar_multa_socio(self, rut_socio: str, monto: float) -> float:
+        """Registra una multa impaga al socio y actualiza en SQLite inmediatamente (P14)."""
+        socio = self.buscar_socio_por_rut(rut_socio)
+        socio.registrar_multa(monto)
+        if hasattr(self, "_socio_dao"):
+            self._socio_dao.guardar(socio)
+        if self._repositorio_bd and hasattr(self._repositorio_bd, "guardar_socio"):
+            self._repositorio_bd.guardar_socio(socio)
+        return socio.monto_multa_acumulada
 
     def pagar_multa_socio(self, rut_socio: str, monto: float) -> float:
         """Procesa el pago de multas acumuladas."""
         socio = self.buscar_socio_por_rut(rut_socio)
         vuelto = socio.pagar_multa(monto)
+        if hasattr(self, "_socio_dao"):
+            self._socio_dao.guardar(socio)
         if self._repositorio_bd and hasattr(self._repositorio_bd, "guardar_socio"):
             self._repositorio_bd.guardar_socio(socio)
-        elif hasattr(self, "_socio_dao"):
-            self._socio_dao.guardar(socio)
         return vuelto
+
+    def eliminar_socio(self, rut_socio: str) -> None:
+        """Elimina un socio del sistema y de la base de datos (CRUD Completo)."""
+        socio = self.buscar_socio_por_rut(rut_socio)
+        rut_limpio = socio.get_rut().replace(".", "").replace("-", "").strip().upper()
+        self._registro_socios.pop(rut_limpio, None)
+        if hasattr(self, "_socio_dao"):
+            self._socio_dao.eliminar_por_rut(rut_socio)
 
     # ==================== CASOS DE USO: USUARIOS Y AUTENTICACIÓN ====================
     def registrar_usuario(self, usuario: Usuario) -> Usuario:
         """Registra un funcionario en el sistema y persiste en base de datos."""
-        self._usuarios_sistema[usuario.username] = usuario
+        self._usuarios_sistema[usuario.username.lower()] = usuario
+        if hasattr(self, "_usuario_dao"):
+            self._usuario_dao.guardar(usuario)
         if self._repositorio_bd and hasattr(self._repositorio_bd, "guardar_usuario"):
             self._repositorio_bd.guardar_usuario(usuario)
             if hasattr(self._repositorio_bd, "registrar_auditoria"):
@@ -242,8 +281,6 @@ class SistemaBiblioteca:
                     "SISTEMA",
                     f"Registro de Usuario @{usuario.username} ({usuario.rol}) - {usuario.get_nombre()}"
                 )
-        elif hasattr(self, "_usuario_dao"):
-            self._usuario_dao.guardar(usuario)
         return usuario
 
     def autenticar_usuario(self, username: str, password: str) -> Optional[Usuario]:
@@ -257,6 +294,7 @@ class SistemaBiblioteca:
     def alta_nuevo_material(self, usuario_admin: Usuario, material: Material) -> None:
         """
         Regla Infranqueable N°4: Solo Administradora puede dar de alta nuevos ejemplares.
+        Persiste en SQLite usando el DAO correspondiente (Table-per-type).
         """
         if not isinstance(usuario_admin, Administradora) and not usuario_admin.tiene_permiso("dar_alta_material"):
             raise PermisoInsuficienteError(usuario_admin.username, "dar_alta_material")
@@ -264,14 +302,8 @@ class SistemaBiblioteca:
         cod = material.codigo
         self._catalogo_materiales[cod] = material
         
-        if self._repositorio_bd and hasattr(self._repositorio_bd, "guardar_material"):
-            self._repositorio_bd.guardar_material(material)
-            if hasattr(self._repositorio_bd, "registrar_auditoria"):
-                self._repositorio_bd.registrar_auditoria(
-                    usuario_admin.username,
-                    f"Alta de material {cod} - '{material.titulo}' ({material.__class__.__name__})"
-                )
-        elif hasattr(self, "_libro_dao"):
+        # Persistencia en BD mediante DAO
+        if hasattr(self, "_libro_dao"):
             if isinstance(material, Libro):
                 self._libro_dao.guardar(material)
             elif isinstance(material, Revista):
@@ -280,9 +312,65 @@ class SistemaBiblioteca:
                 self._multimedia_dao.guardar(material)
             elif isinstance(material, MaterialExtranjero):
                 self._extranjero_dao.guardar(material)
+            elif hasattr(self, "_material_dao"):
+                self._material_dao.guardar_base(material, "GENERAL")
+
+        if self._repositorio_bd and hasattr(self._repositorio_bd, "guardar_material"):
+            self._repositorio_bd.guardar_material(material)
+            if hasattr(self._repositorio_bd, "registrar_auditoria"):
+                self._repositorio_bd.registrar_auditoria(
+                    usuario_admin.username,
+                    f"Alta de material {cod} - '{material.titulo}' ({material.__class__.__name__})"
+                )
+
+    def modificar_material(
+        self,
+        usuario_admin: Usuario,
+        cod_mat: str,
+        nuevo_titulo: Optional[str] = None,
+        nuevo_precio: Optional[float] = None
+    ) -> Material:
+        """
+        Modifica los datos de un material existente y actualiza la BD SQLite (P04).
+        """
+        if not isinstance(usuario_admin, Administradora) and not usuario_admin.tiene_permiso("modificar_material"):
+            raise PermisoInsuficienteError(usuario_admin.username, "modificar_material")
+
+        cod = cod_mat.strip().upper()
+        if cod not in self._catalogo_materiales:
+            raise MaterialNoEncontradoError(cod)
+
+        mat = self._catalogo_materiales[cod]
+        if nuevo_titulo:
+            mat.titulo = nuevo_titulo
+        if nuevo_precio is not None:
+            mat.precio_base_reposicion = nuevo_precio
+
+        # Actualizar en BD mediante el DAO correspondiente
+        if isinstance(mat, Libro) and hasattr(self, "_libro_dao"):
+            self._libro_dao.guardar(mat)
+        elif isinstance(mat, Revista) and hasattr(self, "_revista_dao"):
+            self._revista_dao.guardar(mat)
+        elif isinstance(mat, MaterialMultimedia) and hasattr(self, "_multimedia_dao"):
+            self._multimedia_dao.guardar(mat)
+        elif isinstance(mat, MaterialExtranjero) and hasattr(self, "_extranjero_dao"):
+            self._extranjero_dao.guardar(mat)
+        elif hasattr(self, "_material_dao"):
+            self._material_dao.modificar_titulo(cod, mat.titulo)
+
+        if self._repositorio_bd and hasattr(self._repositorio_bd, "registrar_auditoria"):
+            self._repositorio_bd.registrar_auditoria(
+                usuario_admin.username,
+                f"Modificación de material {cod} - Nuevo título: '{mat.titulo}'"
+            )
+
+        return mat
 
     def baja_material(self, usuario_admin: Usuario, cod_mat: str) -> None:
-        """Regla N°4: Solo Administradora puede retirar ejemplares."""
+        """
+        Regla N°4: Solo Administradora puede retirar ejemplares (P06).
+        Elimina el registro de la memoria y de la base de datos SQLite en cascada.
+        """
         if not isinstance(usuario_admin, Administradora) and not usuario_admin.tiene_permiso("eliminar_material"):
             raise PermisoInsuficienteError(usuario_admin.username, "eliminar_material")
 
@@ -291,10 +379,18 @@ class SistemaBiblioteca:
             raise MaterialNoEncontradoError(cod)
 
         mat = self._catalogo_materiales.pop(cod)
-        if self._repositorio_bd and hasattr(self._repositorio_bd, "eliminar_material"):
-            self._repositorio_bd.eliminar_material(cod)
+        if hasattr(self, "_material_dao"):
+            self._material_dao.eliminar_por_codigo(cod)
         elif hasattr(self, "_libro_dao"):
             self._libro_dao.eliminar_por_codigo(cod)
+
+        if self._repositorio_bd and hasattr(self._repositorio_bd, "eliminar_material"):
+            self._repositorio_bd.eliminar_material(cod)
+        if self._repositorio_bd and hasattr(self._repositorio_bd, "registrar_auditoria"):
+            self._repositorio_bd.registrar_auditoria(
+                usuario_admin.username,
+                f"Baja de material {cod} - '{mat.titulo}'"
+            )
 
     def buscar_material(self, cod_mat: str) -> Material:
         """Consulta un material en el catálogo institucional."""
@@ -659,3 +755,178 @@ class SistemaBiblioteca:
             if p.id_prestamo == id_prestamo:
                 return p
         raise PrestamoNoEncontradoError(id_prestamo)
+
+    def cargar_datos_desde_bd(self) -> None:
+        """
+        Carga y sincroniza el estado de la biblioteca desde las tablas relacionales de SQLite
+        utilizando los Data Access Objects (DAOs). Garantiza persistencia real entre cierres y
+        reaperturas del software (Caso de prueba P05).
+        """
+        if not self._conn:
+            return
+
+        # 1. Cargar Usuarios
+        try:
+            if hasattr(self, "_usuario_dao"):
+                for u in self._usuario_dao.listar_todos():
+                    self._usuarios_sistema[u.username.lower()] = u
+        except Exception:
+            pass
+
+        # 2. Cargar Socios
+        try:
+            if hasattr(self, "_socio_dao"):
+                for s in self._socio_dao.listar_todos():
+                    rut_clean = s.get_rut().replace(".", "").replace("-", "").strip().upper()
+                    self._registro_socios[rut_clean] = s
+                    if s.numero_socio and s.numero_socio >= self._contador_socios:
+                        self._contador_socios = s.numero_socio + 1
+        except Exception:
+            pass
+
+        # 3. Cargar Materiales mediante DAOs polimórficos
+        try:
+            if hasattr(self, "_libro_dao"):
+                for lib in self._libro_dao.listar_todos():
+                    self._catalogo_materiales[lib.codigo] = lib
+            if hasattr(self, "_revista_dao"):
+                for rev in self._revista_dao.listar_todos():
+                    self._catalogo_materiales[rev.codigo] = rev
+            if hasattr(self, "_multimedia_dao"):
+                for mm in self._multimedia_dao.listar_todos():
+                    self._catalogo_materiales[mm.codigo] = mm
+            if hasattr(self, "_extranjero_dao"):
+                for ext in self._extranjero_dao.listar_todos():
+                    self._catalogo_materiales[ext.codigo] = ext
+        except Exception:
+            pass
+
+        # 4. Cargar Préstamos reconstruyendo objetos completos
+        try:
+            if hasattr(self, "_prestamo_dao"):
+                prestamos_cargados = self._prestamo_dao.listar_todos_objetos(
+                    self._catalogo_materiales,
+                    self._registro_socios,
+                    self._usuarios_sistema
+                )
+                self._registro_prestamos = prestamos_cargados
+                for p in self._registro_prestamos:
+                    if p.id_prestamo >= self._contador_prestamos:
+                        self._contador_prestamos = p.id_prestamo + 1
+        except Exception:
+            pass
+
+    def sembrar_datos_iniciales(self) -> None:
+        """
+        Carga datos semilla esenciales para la operatividad inmediata del negocio
+        y los persiste en la base de datos SQLite mediante sus respectivos DAOs.
+        """
+        # 1. Personal del Sistema
+        admin = Administradora(
+            rut="19.876.543-0",
+            nombre_completo="Camila Valenzuela Pavez",
+            telefono="+56911223344",
+            email="cvalenzuela@cordillera.cl",
+            username="admin",
+            password="AdminSuper2026*",
+            nivel_acceso="SUPERADMIN"
+        )
+        biblio1 = BibliotecariaAtencion(
+            rut="17.654.321-3",
+            nombre_completo="Valentina Rojas Morales",
+            telefono="+56922334455",
+            email="vrojas@cordillera.cl",
+            username="vrojas",
+            password="PasswordBiblio123!",
+            turno="Mañana"
+        )
+        biblio2 = BibliotecariaAtencion(
+            rut="16.543.210-K",
+            nombre_completo="Ignacio Soto Silva",
+            telefono="+56933445566",
+            email="isoto@cordillera.cl",
+            username="isoto",
+            password="PasswordBiblio456!",
+            turno="Tarde"
+        )
+        self.registrar_usuario(admin)
+        self.registrar_usuario(biblio1)
+        self.registrar_usuario(biblio2)
+
+        # 2. Socios iniciales
+        self.inscribir_socio(
+            rut="18.234.567-9",
+            nombre_completo="Andrés Castro Morán",
+            telefono="+56988776655",
+            email="andres.castro@inacap.cl"
+        )
+        self.inscribir_socio(
+            rut="15.432.109-8",
+            nombre_completo="Beatriz Fuentes Lara",
+            telefono="+56977665544",
+            email="beatriz.fuentes@gmail.com"
+        )
+        socio3 = self.inscribir_socio(
+            rut="12.345.678-5",
+            nombre_completo="Diego Morales Peña",
+            telefono="+56966554433",
+            email="diego.morales@empresa.cl"
+        )
+        self.registrar_multa_socio(socio3.get_rut(), 2500.0)
+
+        # 3. Materiales de los diferentes tipos
+        libro1 = Libro(
+            codigo="LIB-001",
+            titulo="Cien Años de Soledad",
+            autor_o_creador="Gabriel García Márquez",
+            anio_publicacion=1967,
+            precio_base_reposicion=28000.0,
+            isbn="978-0307474728",
+            editorial="Sudamericana",
+            numero_paginas=471
+        )
+        libro2 = Libro(
+            codigo="LIB-002",
+            titulo="El Quijote de la Mancha",
+            autor_o_creador="Miguel de Cervantes",
+            anio_publicacion=1605,
+            precio_base_reposicion=32000.0,
+            isbn="978-8420412146",
+            editorial="Alfaguara",
+            numero_paginas=863
+        )
+        revista1 = Revista(
+            codigo="REV-001",
+            titulo="National Geographic en Español",
+            autor_o_creador="Varios Autores",
+            anio_publicacion=2024,
+            precio_base_reposicion=12000.0,
+            issn="0027-9358",
+            numero_edicion=145,
+            mes_publicacion="Agosto 2024"
+        )
+        dvd1 = MaterialMultimedia(
+            codigo="DVD-001",
+            titulo="Interstellar (Edición Especial 4K)",
+            autor_o_creador="Christopher Nolan",
+            anio_publicacion=2014,
+            precio_base_reposicion=35000.0,
+            formato="DVD",
+            duracion_minutos=169,
+            clasificacion_edad="+14"
+        )
+        extranjero1 = MaterialExtranjero(
+            codigo="EXT-001",
+            titulo="Artificial Intelligence: A Modern Approach (4th Ed)",
+            autor_o_creador="Stuart Russell & Peter Norvig",
+            anio_publicacion=2020,
+            precio_usd=120.00,
+            pais_origen="Estados Unidos",
+            recargo_aduanero_pct=0.06
+        )
+
+        self.alta_nuevo_material(admin, libro1)
+        self.alta_nuevo_material(admin, libro2)
+        self.alta_nuevo_material(admin, revista1)
+        self.alta_nuevo_material(admin, dvd1)
+        self.alta_nuevo_material(admin, extranjero1)

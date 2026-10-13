@@ -43,17 +43,39 @@ class Material(ABC):
     def titulo(self) -> str:
         return self._titulo
 
+    @titulo.setter
+    def titulo(self, nuevo_titulo: str) -> None:
+        if not nuevo_titulo or not nuevo_titulo.strip():
+            raise ValueError("El título no puede estar vacío.")
+        self._titulo = nuevo_titulo.strip()
+
     @property
     def autor_o_creador(self) -> str:
         return self._autor_o_creador
+
+    @autor_o_creador.setter
+    def autor_o_creador(self, nuevo_autor: str) -> None:
+        if not nuevo_autor or not nuevo_autor.strip():
+            raise ValueError("El autor/creador no puede estar vacío.")
+        self._autor_o_creador = nuevo_autor.strip()
 
     @property
     def anio_publicacion(self) -> int:
         return self._anio_publicacion
 
+    @anio_publicacion.setter
+    def anio_publicacion(self, nuevo_anio: int) -> None:
+        self._anio_publicacion = int(nuevo_anio)
+
     @property
     def precio_base_reposicion(self) -> float:
         return self._precio_base_reposicion
+
+    @precio_base_reposicion.setter
+    def precio_base_reposicion(self, nuevo_precio: float) -> None:
+        if nuevo_precio < 0:
+            raise ValueError("El precio de reposición no puede ser negativo.")
+        self._precio_base_reposicion = float(nuevo_precio)
 
     @abstractmethod
     def dias_prestamo(self) -> int:

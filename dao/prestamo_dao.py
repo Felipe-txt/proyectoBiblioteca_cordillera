@@ -136,3 +136,74 @@ class PrestamoDao(Dao):
             resultado.append(p_dict)
             
         return resultado
+
+    def listar_todos_objetos(
+        self,
+        materiales_dict: Dict[str, Material],
+        socios_dict: Dict[str, Socio],
+        usuarios_dict: Dict[str, Usuario]
+    ) -> List[Prestamo]:
+        """
+        Reconstruye la lista completa de objetos Prestamo con sus DetallePrestamo
+        vinculados a sus entidades de dominio respectivas.
+        """
+        filas_crudas = self.listar_todos_crudos()
+        prestamos_reconstruidos = []
+
+        # Mapa para normalizar RUTs
+        socios_por_rut = {}
+        for s in socios_dict.values():
+            rut_clean = s.get_rut().replace(".", "").replace("-", "").strip().upper()
+            socios_por_rut[rut_clean] = s
+
+        for pc in filas_crudas:
+            rut_clean = pc["rut_socio"].replace(".", "").replace("-", "").strip().upper()
+            socio_obj = socios_por_rut.get(rut_clean)
+            if not socio_obj:
+                continue
+
+            user_obj = usuarios_dict.get(pc["username_bibliotecaria"].lower())
+            if not user_obj and usuarios_dict:
+                user_obj = list(usuarios_dict.values())[0]
+
+            fecha_p = datetime.fromisoformat(pc["fecha_prestamo"]) if pc.get("fecha_prestamo") else datetime.now()
+            p = Prestamo(
+                id_prestamo=pc["id_prestamo"],
+                socio=socio_obj,
+                bibliotecaria=user_obj,
+                fecha_prestamo=fecha_p,
+                estado=pc.get("estado", "ACTIVO")
+            )
+
+            for dc in pc.get("detalles", []):
+                cod_m = dc["codigo_material"].upper()
+                mat_obj = materiales_dict.get(cod_m)
+                if not mat_obj:
+                    continue
+
+                f_inicio = date.fromisoformat(dc["fecha_inicio"]) if dc.get("fecha_inicio") else date.today()
+                f_esp = date.fromisoformat(dc["fecha_devolucion_esperada"]) if dc.get("fecha_devolucion_esperada") else f_inicio
+                f_real = date.fromisoformat(dc["fecha_devolucion_real"]) if dc.get("fecha_devolucion_real") else None
+
+                item = DetallePrestamo(
+                    id_detalle=dc["id_detalle"],
+                    material=mat_obj,
+                    fecha_inicio=f_inicio,
+                    dias_prestamo=dc["dias_prestamo_otorgados"],
+                    devuelto=bool(dc["devuelto"]),
+                    cantidad_renovaciones=dc["cantidad_renovaciones"],
+                    fecha_devolucion_real=f_real,
+                    fecha_devolucion_esperada=f_esp
+                )
+                p._items_prestamo.append(item)
+
+            prestamos_reconstruidos.append(p)
+
+        return prestamos_reconstruidos
+
+    def eliminar(self, id_prestamo: int) -> None:
+        """Elimina un préstamo y sus detalles asociados en cascada."""
+        self.crear_tabla()
+        self.cursor.execute("DELETE FROM detalles_prestamo WHERE id_prestamo = ?", (int(id_prestamo),))
+        self.cursor.execute("DELETE FROM prestamos WHERE id_prestamo = ?", (int(id_prestamo),))
+        self.conexion.commit()
